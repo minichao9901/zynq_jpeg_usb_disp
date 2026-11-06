@@ -1,0 +1,17 @@
+[
+  {
+    "Status": "OK",
+    "Class": "USB",
+    "FriendlyName": "USB Composite Device"
+  },
+  {
+    "Status": "OK",
+    "Class": "Display",
+    "FriendlyName": "xfz1986_usb_graphic(demo)"
+  },
+  {
+    "Status": "OK",
+    "Class": "USBDevice",
+    "FriendlyName": "Zynq USB Display diagnostics"
+  }
+]

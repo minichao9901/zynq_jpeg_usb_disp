@@ -1,0 +1,38 @@
+{
+  "compiler": "E:\\Xilinx\\SDK\\2018.3\\gnu\\aarch32\\nt\\gcc-arm-none-eabi\\bin\\arm-none-eabi-gcc.exe",
+  "flags": [
+    "-mcpu=cortex-a9",
+    "-mfpu=vfpv3",
+    "-mfloat-abi=hard",
+    "-O3",
+    "-g3",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-Wall",
+    "-Wextra",
+    "-std=gnu11",
+    "-IE:\\zynq_jpeg_usb_disp\\build\\software\\bsp\\ps7_cortexa9_0\\include",
+    "-IE:\\zynq_jpeg_usb_disp\\firmware"
+  ],
+  "sha256": {
+    "firmware\\display.c": "8d7a64b9c9a0db00fc89bd9d986eab12d1b1ab693bd2139c3ed42366382d8bab",
+    "firmware\\display.h": "d5c92abfc4406163786c636780ec00d7d8da356f3abcaf0b3cf2dfe32a817a8b",
+    "firmware\\display_ctrl\\display_ctrl.c": "10d9f74095a7edc862e2389f9a65e3e741251f537d9b45482259350d3fd8179a",
+    "firmware\\display_ctrl\\display_ctrl.h": "ba3f3a6f0d3256a3d867584f8b8b9b04f3be38c1c7dddeaf796914a43832bcba",
+    "firmware\\display_ctrl\\lcd_modes.h": "f2dd31252f412efc14ed97cb51b0e2d434304c3a232a3eee9f498cfc726a37e6",
+    "firmware\\dynclk\\dynclk.c": "d40a8ce32203282b16881c7a110e611e1a8fe76ee8284f914e2a0a72f4a12c77",
+    "firmware\\dynclk\\dynclk.h": "7815ae7c3a1fcfbebc44630826b30639a0fd5475b126cf133429f00bbacd7226",
+    "firmware\\lscript.ld": "e61d8c9ebe398646a14ee08ebd0f66a933f15963c44fb042c052bac054fcb31b",
+    "firmware\\main.c": "409084278e76ac7333269999c323360bb1593d9a7e88fdcfec21a99419dee10a",
+    "firmware\\usb_display.c": "48d91dc6aee66410ce86e6ef61cdc8ce72daf8f704c2941a6ed4a7a40cc36b07",
+    "firmware\\usb_display.h": "e384b25a6d06d949e44d0247f712c380a62cce86e587d5b34608f2f9f412225e",
+    "firmware\\Xilinx.spec": "f100af82b444989adf5aad4ad612b9ae3b4ddac007f5d9653f1abf254235b085",
+    "firmware\\xusbps_ch9.h": "d8c9dc12b1ed2dc7d259ae3ca418ba253c0663018ab9fea7e871babc08954163",
+    "firmware\\xusbps_intr.c": "4002eaa1efef9ef6e3c2a03a616460ff5a1f87ea796f6df05bf9a678bfb0cf0e",
+    "prebuilt\\system.hdf": "787f79b3149b1085c50dc45c4fd5c06ff10dd2643c793564b1ce2a79849d0c81",
+    "prebuilt\\ps7_init.tcl": "7112666d7394812d4e37e1a4f63a0ba80cf21487776d746540bd82eb9310bfe4",
+    "prebuilt\\usb_display.elf": "5a805f813fc4454f75c68453fe32f2146e8922f7fe4474db920bd76a5545b247",
+    "build\\software\\bsp\\ps7_cortexa9_0\\lib\\libxil.a": "000275bd396d8e29bd6abfe917a3c8ac7c6ecbbc00a988a4819be5591e7044f7",
+    "prebuilt/usb_display.bit": "73f50f93bf252401125aa6ca734237304ebf4090c4d5e1b3398fe4e7f94397ae"
+  }
+}

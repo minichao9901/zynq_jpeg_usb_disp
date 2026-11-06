@@ -1,0 +1,6 @@
+VDMA_cr 65537
+VDMA_sr 69632
+VDMA_vsize 480
+VDMA_hsize 2400
+VDMA_stride 2400
+VDMA_start 33554432

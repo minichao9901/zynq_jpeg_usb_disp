@@ -1,0 +1,4 @@
+{
+  "TimeCreated": "2026-11-06T17:56:40.3814249+08:00",
+  "Message": "出错应用程序名称： dwm.exe，版本： 10.0.26100.9549，时间戳： 0x653fab24\r\n出错模块名称： dwmcore.dll， 版本： 10.0.26100.9711，时间戳： 0x9233e01a\r\n异常代码： 0xc00001ad\r\n错误偏移： 0x0000000000196538\r\n出错进程 ID： 0x858\r\n出错应用程序开始时间： 0x1DD6D391066D56F\r\nFaulting 应用程序路径： C:\\WINDOWS\\system32\\dwm.exe\r\nFaulting 模块路径： C:\\WINDOWS\\system32\\dwmcore.dll\r\nReport ID： 802d1d65-a3ac-4063-910a-03b798ee8fae\r\nFaulting 包全名： \r\nFaulting 程序包相对应用程序 ID：  个"
+}

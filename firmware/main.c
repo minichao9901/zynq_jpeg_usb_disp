@@ -15,7 +15,7 @@ int main(void)
     udisp_stats[S_PANEL] = display_panel_id;
     udisp_stats[S_WIDTH] = display_width;
     udisp_stats[S_HEIGHT] = display_height;
-    xil_printf("\r\nZynq USB Display RGB565: panel=%x %ux%u init=%d\r\n",
+    xil_printf("\r\nZynq USB Display RGB565/JPEG: panel=%x %ux%u init=%d\r\n",
                display_panel_id, display_width, display_height, result);
     if (result) { udisp_stats[S_STAGE] = 0x80000000U | (unsigned)-result; goto failed; }
     udisp_stats[S_STAGE] = 2;

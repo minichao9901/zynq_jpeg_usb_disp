@@ -7,6 +7,8 @@
 extern uint32_t display_width, display_height, display_panel_id;
 int display_init(void);
 int display_rgb565(const uint8_t *pixels, unsigned x, unsigned y, unsigned w, unsigned h);
+uint8_t *display_prepare(unsigned x,unsigned y,unsigned w,unsigned h);
+int display_commit(uint8_t *base);
 uint32_t display_front_address(void);
 uint32_t display_vdma_status(void);
 uint32_t display_frame_crc(void);

@@ -7,7 +7,7 @@ from pathlib import Path
 import struct
 import subprocess
 import time
-from usb_host import connect, stats, frame, pattern, fnv, rgb_to_bgr, wait_for, ROOT
+from usb_host import connect, stats, frame, pattern, fnv, rgb_to_bgr, wait_for, ROOT,set_profile
 import usb.util
 
 
@@ -19,6 +19,7 @@ def main():
     args.out.mkdir(parents=True,exist_ok=True)
     report={'passed':False,'tests':[]}
     dev=connect()
+    set_profile(dev,0)
     def save():
         (args.out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
     def send(payload,w,h,x=0,y=0,mode=0,parts=None):
@@ -70,8 +71,10 @@ def main():
         s=wait_for(dev,'bad',start['bad']+1)
         check('reject out-of-bounds rectangle',s,expected)
         assert s['ep2_frames']==start['ep2_frames']
-        s=send(b'\xff\xd8\xff\xd9',w,h,mode=3)
-        check('reject unsupported JPEG, retain displayed image',s,expected)
+        start=stats(dev)
+        dev.write(2,frame(b'\xff\xd8\xff\xd9',w,h,mode=3),timeout=3000)
+        s=wait_for(dev,'bad',start['bad']+1)
+        check('reject malformed JPEG, retain displayed image',s,expected)
         start=stats(dev)
         dev.write(2,frame(b'\x00\x00'*16,4,4)[:7],timeout=3000)
         wait_for(dev,'rx_timeouts',start['rx_timeouts']+1,timeout=3)
@@ -125,6 +128,7 @@ def main():
         print(json.dumps(report,indent=2))
     finally:
         save()
+        set_profile(dev,2)
         usb.util.dispose_resources(dev)
 
 

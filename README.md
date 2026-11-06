@@ -1,8 +1,14 @@
-# Zynq USB Display（RGB565 首版）
+# Zynq USB Display（RGB565 + JPEG）
 
 目标硬件：正点原子 Zynq-7020，PS USB3320，PL VDMA + RGB LCD，800×480。
-本版实现 RGB565，兼容本机已安装的 `xfz1986_usb_graphic` Windows IDD 驱动。
-JPEG 的类型字段保留；当前收到非 RGB565 帧会完整丢弃并计数，不进行 JPEG 解码。
+支持 RGB565 和 JPEG，兼容本机已安装的 `xfz1986_usb_graphic` Windows IDD 驱动。
+JPEG 使用 Cortex-A9 Neon 加速的 libjpeg-turbo 3.1.2，直接解码到后台 BGR888 帧缓冲。
+PL 仍复用 LCD 参考例程，本版没有新增 RTL。
+
+RGB565 基线提交 `ad341fa`，tag 为 `rgb565-baseline-20261106`。
+当前 JPEG 版本的板测与 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)。
+无帧率限制的三轮中位数：纯接收 **41.97 MB/s**，RGB565 转换并提交 VDMA **41.74 MB/s**。
+此前 23 MB/s 来自 30fps 主动限速（800×480×2×30=23.04MB/s），不是 USB 上限。
 
 ## 当前交付与验证
 
@@ -10,7 +16,7 @@ JPEG 的类型字段保留；当前收到非 RGB565 帧会完整丢弃并计数�
 - `prebuilt/usb_display.elf`：本工程重新编译的 PS USB Display 固件。
 - `prebuilt/system.hdf`、`prebuilt/ps7_init.tcl`：增加 PS USB 的硬件描述与初始化文件。
 - `prebuilt/manifest.json`：源码、BSP 库、bit/ELF/HDF/初始化文件的 SHA-256。
-- 板测结果见 [docs/validation.md](docs/validation.md)，机器可读证据在 `docs/validation/`。
+- 当前板测见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)，RGB565 历史基线见 [docs/validation.md](docs/validation.md)。
 
 屏幕目前未接；已验证 USB、Windows 驱动、RGB565 转换、VDMA 运行及物理 DDR 内容。
 实际 LCD 的颜色、方向、同步稳定性和停止/重启 VDMA 时的观感，需接屏后验收。
@@ -19,7 +25,7 @@ JPEG 的类型字段保留；当前收到非 RGB565 帧会完整丢弃并计数�
 ## 构建、下载
 
 在本目录运行，工具链为 `E:/Xilinx/SDK/2018.3` 和 `E:/Xilinx/Vivado/2018.3`。
-Python 依赖：`python -m pip install -r requirements.txt`。
+Python 依赖：`python -m pip install -r requirements.txt`；JPEG 静态库构建还需 CMake、Ninja 在 PATH 中。
 
 ```powershell
 # 已有配套 BSP 时仅重新编译固件
@@ -33,6 +39,10 @@ python tools/build.py --bsp
 
 # 查询枚举、速度、帧计数和 VDMA 状态
 python tools/usb_host.py stats
+
+# 在同一固件上切换 Windows IDD 发送格式；脚本保留原主屏
+python tools/set_mode.py jpeg
+python tools/set_mode.py rgb565
 ```
 
 `tools/load.tcl` 会处理断电后 hw_server 保留的 DAP 错误状态，执行 PS 初始化，
@@ -59,7 +69,8 @@ python tools/build.py --bsp
 | MI_00 | USB Display | OUT 0x01 / IN 0x81，`xfz1986_usb_graphic` |
 | MI_01 | 诊断及测试送帧 | OUT 0x02 / IN 0x82，MS OS 2.0 自动绑定 WinUSB |
 
-产品串为 `zynq_R800x480_Ergb16_Fps30_Bl128`。
+产品串为 `zynq_R800x480_Ejpg8_Ergb16_Fps30_Bl4096`，优先使用 JPEG，质量参数 8。
+`Bl4096` 表示缓冲上限 4096KiB，并非行数。帧头实际长度字段最大为 4MiB−1。
 原 ESP32 工程说明中的全局注册表 `udisp` 会覆盖产品串，本次已备份旧值并设置为本产品串：
 
 ```powershell
@@ -86,17 +97,24 @@ MI_01 的 WinUSB 诊断接口可独立使用。
 
 # 手动送一张色条，IDD 活跃时可能被桌面画面覆盖
 python tools/usb_host.py colorbars
+
+# JPEG 图像、异常恢复、物理 DDR 对比及连续 300 帧
+./tools/jpeg_test.ps1
+
+# 不限帧率，分别测带 FNV 校验、正常显示和纯接收，默认三轮
+./tools/benchmark.ps1
 ```
 
 测试覆盖整帧、分片头/短包、跨传输帧、区域更新、越界区域拒绝、非 RGB 类型拒绝、中途残留数据后重新同步、
 截断帧超时恢复、连续 300 帧 30fps，以及 MEM-AP0 物理读回整张 BGR888 scanout 帧缓冲逐字节比较。
-负向测试会故意使 `bad`、`unsupported`、`rx_timeouts` 各增加 1；暂停/恢复 IDD 也可能中止其在途帧并增加超时计数。
+负向测试会故意增加 `bad`、`rx_timeouts` 等计数；暂停/恢复 IDD 也可能中止其在途帧并增加超时计数。
 应比较正常持续流期间的增量，不能把测试后的累计计数当作正常流量故障。
 Windows 桌面本身的内容变化决定 IDD 发送帧率；合成流测试的 30fps 不能代替所有桌面场景的测量。
 
 ## 数据链路与协议
 
 `USB HS bulk OUT → 32×16KiB DMA 环 → 主循环流解析 → RGB565 LE 转 BGR888 → DDR → VDMA → RGB LCD`。
+JPEG 路径为：`USB → 帧缓冲 → Neon JPEG 解码直接写后台 BGR888 → cache flush → VDMA`。
 中断仅处理控制请求；大块收帧、像素转换与显示更新都在主循环，接收环满时由 USB NAK 施加反压。
 
 16 字节帧头与 ESP32 参考实现一致，所有整数为小端，不依赖 C 位域布局：
@@ -104,13 +122,15 @@ Windows 桌面本身的内容变化决定 IDD 发送帧率；合成流测试的 
 | 偏移 | 长度 | 内容 |
 | --- | --- | --- |
 | 0 | 2 | crc16，按参考实现接收但未校验 |
-| 2 | 1 | type，0=RGB565，其他值当前不解码 |
+| 2 | 1 | type，0=RGB565，3=JPEG；其他编码排空并计数 |
 | 3 | 1 | cmd，保留 |
 | 4,6 | 各2 | x,y |
 | 8,10 | 各2 | width,height |
 | 12 | 4 | frame_id 在低10位，payload_total 在高22位 |
 
 RGB565 负载必须为 `width*height*2`，区域必须落在 800×480 内。
+JPEG 内部尺寸必须与帧头相同，8-bit、1/3 分量，支持 4:2:0、4:2:2、4:4:4、灰度、渐进式。
+算术编码、CMYK、非 8-bit 和损坏/截断 JPEG 会被拒绝，保留上一幅已提交画面。
 接收支持任意 USB 传输分片及连续帧，不把短包当作图像结束标志。
 接收中断超过 500ms 后重置未完成帧；无帧魔数，复位/残留数据后按类型、尺寸、长度关系逐字节寻找合理帧头。
 已验证跳过 2049 字节残留数据后恢复下一帧；没有魔数或强制 CRC，仍不宣称任意损坏均能无歧义恢复。
@@ -118,10 +138,19 @@ RGB565 负载必须为 `width*height*2`，区域必须落在 800×480 内。
 
 VDMA 仍为参考 PL 的一个硬件帧槽。软件使用 0x02000000、0x02200000、0x02400000 三个 BGR888 缓冲；
 先在后台缓冲完成转换并 flush cache，再停 MM2S、等待 halted、切换地址并重启。
-区域更新先复制原画面以保留区域外内容。每次完成显示更新后计算 FNV-1a 指纹供诊断验证。
+区域更新先复制原画面以保留区域外内容。生产路径默认关闭整帧 FNV-1a；板测显式启用后进行指纹验证。
+原每帧 FNV 约耗时 9.9ms，是无节流 RGB 链路约 29.4MB/s 的主要附加开销。
 
 诊断 vendor IN `0x30`（bmRequestType=0xC1,wIndex=1）返回 32 个小端 uint32，字段顺序见
 `firmware/usb_display.h` 和 `tools/usb_host.py`。`frame_fnv` 为 FNV-1a，非线协议 CRC。
+该字段只在 FNV 验证模式下更新，正常模式下可能保留旧值。
+
+诊断 IN `0x31` 返回耗时统计，OUT `0x33` 的 wValue 选择模式：0=显示+FNV，1=纯接收，2=正常显示不算 FNV（默认）。
+索引见 `firmware/profile.h`，累计耗时单位为微秒。仅在暂停 IDD、无在途测试帧时切换诊断模式。
+
+JPEG 渐变测试图连续 300 帧稳定约 30fps，不限速约 72.7 次解码/提交每秒；高熵噪声图约 26.2fps。
+复杂图像不保证 30fps，瓶颈是 CPU 解码。若要求任意这类图像都超过 30fps，需要进一步做 PL 硬件解码。
+这些数字表示软件处理和 VDMA 提交能力，不是未接 LCD 的面板刷新率实测。
 
 ## 移植要点
 
@@ -130,3 +159,6 @@ VDMA 仍为参考 PL 的一个硬件帧槽。软件使用 0x02000000、0x0220000
 3. USB3320 的 MIO28..39 使用 1.8V，MIO8 为低有效复位。固件在初始化 USB 前显式设置并释放 PHY。
 4. LCD 显示控制、动态时钟与引脚沿用 `19_vdma_lcd`，固定 33MHz 像素时钟和 800×480 时序。
 5. 参考工程中的上游版权说明保留在相应源文件；本版未移植 ESP32 的音频功能。
+
+JPEG 依赖源码、版本和许可见 [third_party/README.md](third_party/README.md)。
+This software is based in part on the work of the Independent JPEG Group.

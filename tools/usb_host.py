@@ -47,6 +47,18 @@ def stats(dev):
     return result
 
 
+PROFILE_KEYS='version flags frames convert_us jpeg_us flush_us wait_us fnv_us copy_us frame_us last_us max_us jpeg_errors neon sink_frames hz'.split()
+
+
+def profile(dev):
+    data=bytes(dev.ctrl_transfer(0xc1,0x31,0,1,128,timeout=3000))
+    return dict(zip(PROFILE_KEYS,struct.unpack('<32I',data)))
+
+
+def set_profile(dev,flags):
+    dev.ctrl_transfer(0x41,0x33,flags,1,b'',timeout=3000)
+
+
 def frame(payload, w, h, x=0, y=0, frame_id=0, mode=0):
     if len(payload)>0x3fffff:
         raise ValueError('Payload exceeds wire length field')

@@ -43,9 +43,17 @@ def main():
         run([SDK/'gnuwin/bin/make.exe', '-C', out/'bsp', '-j1', 'SHELL=cmd.exe'], 'bsp-build.log', env=env)
         shutil.copy2(hw/'ps7_init.tcl', ROOT/'prebuilt/ps7_init.tcl')
     gcc = SDK/'gnu/aarch32/nt/gcc-arm-none-eabi/bin/arm-none-eabi-gcc.exe'
+    jpeg_out=ROOT/'build/jpeg'
+    run(['cmake','-S',ROOT/'third_party/libjpeg-turbo','-B',jpeg_out,'-G','Ninja',
+         '-DCMAKE_TOOLCHAIN_FILE='+str(ROOT/'tools/arm-jpeg.cmake'),'-DCMAKE_BUILD_TYPE=Release',
+         '-DENABLE_SHARED=OFF','-DWITH_TURBOJPEG=OFF','-DWITH_TOOLS=OFF','-DWITH_TESTS=OFF',
+         '-DWITH_ARITH_DEC=OFF','-DWITH_ARITH_ENC=OFF','-DREQUIRE_SIMD=ON','-DHAVE_THREAD_LOCAL=0'],
+        'jpeg-configure.log',env=env)
+    run(['cmake','--build',jpeg_out,'--target','jpeg-static','-j','4'],'jpeg-build.log',env=env)
     flags = ['-mcpu=cortex-a9', '-mfpu=vfpv3', '-mfloat-abi=hard', '-O3', '-g3',
              '-ffunction-sections', '-fdata-sections', '-Wall', '-Wextra', '-std=gnu11',
-             '-I'+str(bsp/'include'), '-I'+str(ROOT/'firmware')]
+             '-I'+str(bsp/'include'), '-I'+str(ROOT/'firmware'),
+             '-I'+str(ROOT/'third_party/libjpeg-turbo/src'),'-I'+str(jpeg_out)]
     objects = []
     for source in sorted((ROOT/'firmware').rglob('*.c')):
         obj = out/(source.relative_to(ROOT/'firmware').as_posix().replace('/', '_')+'.o')
@@ -54,9 +62,11 @@ def main():
     elf = ROOT/'prebuilt/usb_display.elf'
     run([gcc, *flags, '-specs='+str(ROOT/'firmware/Xilinx.spec'), '-Wl,--build-id=none', '-Wl,--gc-sections',
          '-Wl,-T,'+str(ROOT/'firmware/lscript.ld'), '-Wl,-Map,'+str(out/'usb_display.map'),
-         '-L'+str(bsp/'lib'), '-o', elf, *objects, '-Wl,--start-group', '-lxil', '-lm', '-lgcc', '-lc', '-Wl,--end-group'], 'link.log', env=env)
+         '-L'+str(bsp/'lib'), '-o', elf, *objects, '-Wl,--start-group', jpeg_out/'libjpeg.a', '-lxil', '-lm', '-lgcc', '-lc', '-Wl,--end-group'], 'link.log', env=env)
     files = [*sorted((ROOT/'firmware').rglob('*')), ROOT/'prebuilt/system.hdf',
-             ROOT/'prebuilt/ps7_init.tcl', elf, bsp/'lib/libxil.a']
+             ROOT/'prebuilt/ps7_init.tcl', elf, bsp/'lib/libxil.a', jpeg_out/'libjpeg.a',
+             ROOT/'tools/build.py',ROOT/'tools/arm-jpeg.cmake',jpeg_out/'jconfig.h',jpeg_out/'jconfigint.h',
+             *sorted((ROOT/'third_party/libjpeg-turbo').rglob('*'))]
     manifest = {'compiler': str(gcc), 'flags': flags, 'sha256': {
         str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in files if p.is_file()}}
     bit = ROOT/'prebuilt/usb_display.bit'

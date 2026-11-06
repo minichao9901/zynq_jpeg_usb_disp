@@ -12,6 +12,8 @@
 #include "xil_cache.h"
 #include "xtime_l.h"
 #include "sleep.h"
+#include "profile.h"
+#include "jpeg_display.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -24,6 +26,8 @@ static uint8_t dma_arena[1200*1024] __attribute__((aligned(4096)));
 _Static_assert(2048U+6U*64U+64U*(4U+2U*(RX_COUNT+4U))+128U+2U*RX_COUNT*RX_SIZE
                <= sizeof dma_arena,"USB DMA arena capacity");
 volatile uint32_t udisp_stats[S_COUNT] ALIGN32;
+volatile uint32_t udisp_profile[P_COUNT] ALIGN32;
+volatile unsigned profile_flags=PROFILE_NO_FNV;
 static volatile unsigned configured, epoch, reset_parser;
 static unsigned display_failed;
 static char product[80];
@@ -47,9 +51,10 @@ _Static_assert(sizeof bos == 33, "BOS size");
 
 typedef struct {
     uint8_t header[16];
-    uint8_t pixels[UDISP_MAX_PIXELS*2] ALIGN32;
+    uint8_t pixels[4U*1024U*1024U] ALIGN32;
     unsigned header_used, used, length, x, y, w, h, id, type, reject, seeking;
     XTime last;
+    XTime copy_ticks;
 } Stream;
 static Stream streams[2];
 
@@ -188,6 +193,17 @@ static void setup(XUsbPs_SetupData *s)
             snapshot[S_FRONT]=display_front_address();
             snapshot[S_SPEED]=high_speed()?480:12;
             result=send_reply(snapshot,sizeof snapshot,s->wLength);
+        } else if(s->bmRequestType==0xc1 && s->bRequest==0x31 && s->wIndex==1) {
+            uint32_t snapshot[P_COUNT];
+            memcpy(snapshot,(const void *)udisp_profile,sizeof snapshot);
+            snapshot[P_VERSION]=1; snapshot[P_FLAGS]=profile_flags;
+            snapshot[P_HZ]=COUNTS_PER_SECOND;
+            result=send_reply(snapshot,sizeof snapshot,s->wLength);
+        } else if(s->bmRequestType==0x41 && s->bRequest==0x33 && s->wIndex==1 && !s->wLength && s->wValue<=3) {
+            profile_flags=s->wValue;
+            memset((void *)udisp_profile,0,sizeof udisp_profile);
+            udisp_profile[P_NEON]=jpeg_neon_available();
+            result=send_reply(NULL,0,0);
         } else if(s->bmRequestType==0x41 && s->bRequest==0x32 && s->wIndex==1 && !s->wLength) {
             reset_parser=1;
             result=send_reply(NULL,0,0);
@@ -278,8 +294,9 @@ int usb_display_init(void)
     XUsbPs_DeviceConfig dc={0};
     unsigned ep;
     unsigned mio;
-    snprintf(product,sizeof product,"zynq_R%ux%u_Ergb16_Fps30_Bl128",(unsigned)display_width,(unsigned)display_height);
+    snprintf(product,sizeof product,"zynq_R%ux%u_Ejpg8_Ergb16_Fps30_Bl4096",(unsigned)display_width,(unsigned)display_height);
     make_msos();
+    udisp_profile[P_NEON]=jpeg_neon_available();
     if(!cfg || !icfg) return 1;
     /* Board USB3320 RESET_N is MIO8 (same wiring as zynqlinkPRO).
      * Some SDK 2018.3 hardware exports retain old PS init side products;
@@ -329,7 +346,7 @@ int usb_display_init(void)
     return 0;
 }
 
-static void stream_reset(Stream *s) { s->header_used=s->used=s->length=s->reject=s->seeking=0; }
+static void stream_reset(Stream *s) { s->header_used=s->used=s->length=s->reject=s->seeking=0; s->copy_ticks=0; }
 
 static void consume(Stream *s, unsigned ep, const uint8_t *p, unsigned n)
 {
@@ -364,24 +381,45 @@ static void consume(Stream *s, unsigned ep, const uint8_t *p, unsigned n)
             s->reject=!s->w || !s->h || s->w>display_width || s->h>display_height ||
                 s->x+s->w>display_width || s->y+s->h>display_height ||
                 (s->type==0 && s->length!=s->w*s->h*2);
-            if(s->type!=0) s->reject=2;
+            if(s->type!=0 && s->type!=3) s->reject=2;
         }
         k=s->length-s->used; if(k>n) k=n;
-        if(!s->reject) memcpy(s->pixels+s->used,p,k);
+        if(!s->reject && !(profile_flags&PROFILE_RX_ONLY)) {
+            XTime start=profile_now();
+            memcpy(s->pixels+s->used,p,k);
+            s->copy_ticks+=profile_now()-start;
+        }
         s->used+=k; p+=k; n-=k;
         if(s->used==s->length) {
             udisp_stats[S_LAST_ID]=s->id; udisp_stats[S_LAST_TYPE]=s->type;
             udisp_stats[S_LAST_X]=s->x; udisp_stats[S_LAST_Y]=s->y;
             udisp_stats[S_LAST_WIDTH]=s->w; udisp_stats[S_LAST_HEIGHT]=s->h;
             udisp_stats[S_LAST_LENGTH]=s->length;
+            udisp_profile[P_COPY_US]+=profile_us(s->copy_ticks);
             if(s->reject) ++udisp_stats[s->reject==2?S_UNSUPPORTED:S_BAD];
-            else if(display_failed || display_rgb565(s->pixels,s->x,s->y,s->w,s->h)) {
-                display_failed=1; ++udisp_stats[S_DISPLAY_ERRORS];
-            } else {
-                udisp_stats[S_FRONT]=display_front_address();
-                udisp_stats[S_FRAME_FNV]=display_frame_crc();
-                ++udisp_stats[S_FRAMES];
-                ++udisp_stats[ep==1?S_EP1_FRAMES:S_EP2_FRAMES];
+            else {
+                int status=0;
+                XTime start=profile_now();
+                if(profile_flags&PROFILE_RX_ONLY) ++udisp_profile[P_SINK_FRAMES];
+                else if(display_failed) status=-1;
+                else if(s->type==3) status=jpeg_display(s->pixels,s->length,s->x,s->y,s->w,s->h);
+                else status=display_rgb565(s->pixels,s->x,s->y,s->w,s->h);
+                if(status>0) { ++udisp_stats[S_BAD]; if(s->type==3) ++udisp_profile[P_JPEG_ERRORS]; }
+                else if(status<0) { display_failed=1; ++udisp_stats[S_DISPLAY_ERRORS]; }
+                else {
+                    if(!(profile_flags&(PROFILE_RX_ONLY|PROFILE_NO_FNV))) {
+                        XTime hash_start=profile_now();
+                        udisp_stats[S_FRAME_FNV]=display_frame_crc();
+                        profile_add(P_FNV_US,hash_start);
+                    }
+                    udisp_stats[S_FRONT]=display_front_address();
+                    ++udisp_stats[S_FRAMES];
+                    ++udisp_stats[ep==1?S_EP1_FRAMES:S_EP2_FRAMES];
+                    ++udisp_profile[P_FRAMES];
+                    udisp_profile[P_LAST_US]=profile_us(profile_now()-start);
+                    udisp_profile[P_FRAME_US]+=udisp_profile[P_LAST_US];
+                    if(udisp_profile[P_LAST_US]>udisp_profile[P_MAX_US]) udisp_profile[P_MAX_US]=udisp_profile[P_LAST_US];
+                }
             }
             stream_reset(s);
         }

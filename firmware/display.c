@@ -4,6 +4,7 @@
 #include "xgpio.h"
 #include "xil_cache.h"
 #include "xtime_l.h"
+#include "profile.h"
 #include <string.h>
 
 uint32_t display_width, display_height, display_panel_id;
@@ -60,12 +61,10 @@ int display_init(void)
 
 int display_rgb565(const uint8_t *pixels, unsigned x, unsigned y, unsigned w, unsigned h)
 {
-    unsigned back = (front+1)%3, row, col;
-    uint8_t *base = (uint8_t *)address(back);
-    XTime start, now;
-    if (!w || !h || x+w>display_width || y+h>display_height) return -1;
-    if (x || y || w != display_width || h != display_height)
-        memcpy(base, (void *)address(front), display_width*display_height*3);
+    unsigned row, col;
+    uint8_t *base = display_prepare(x,y,w,h);
+    XTime start=profile_now();
+    if (!base) return -1;
     for (row = 0; row < h; ++row) {
         uint8_t *d = base + ((y+row)*display_width+x)*3;
         for (col = 0; col < w; ++col) {
@@ -77,7 +76,26 @@ int display_rgb565(const uint8_t *pixels, unsigned x, unsigned y, unsigned w, un
             pixels += 2;
         }
     }
-    Xil_DCacheFlushRange(address(back), display_width*display_height*3);
+    profile_add(P_CONVERT_US,start);
+    return display_commit(base);
+}
+
+uint8_t *display_prepare(unsigned x,unsigned y,unsigned w,unsigned h)
+{
+    uint8_t *base=(uint8_t *)address((front+1)%3);
+    if (!w || !h || x+w>display_width || y+h>display_height) return NULL;
+    if (x || y || w != display_width || h != display_height)
+        memcpy(base,(void *)address(front),display_width*display_height*3);
+    return base;
+}
+
+int display_commit(uint8_t *base)
+{
+    unsigned back=((uint32_t)base-UDISP_FB_BASE)/UDISP_FB_SPAN;
+    XTime start=profile_now(),now;
+    if(back>=3 || base!=(uint8_t *)address(back) || back==front) return -1;
+    Xil_DCacheFlushRange((INTPTR)base, display_width*display_height*3);
+    profile_add(P_FLUSH_US,start);
     XAxiVdma_DmaStop(&vdma, XAXIVDMA_READ);
     XTime_GetTime(&start);
     do {
@@ -86,6 +104,7 @@ int display_rgb565(const uint8_t *pixels, unsigned x, unsigned y, unsigned w, un
             if (XAxiVdma_DmaSetBufferAddr(&vdma,XAXIVDMA_READ,frames) ||
                 XAxiVdma_DmaStart(&vdma,XAXIVDMA_READ)) return -2;
             front = back;
+            profile_add(P_WAIT_US,start);
             return 0;
         }
         XTime_GetTime(&now);
@@ -96,7 +115,7 @@ int display_rgb565(const uint8_t *pixels, unsigned x, unsigned y, unsigned w, un
 
 uint32_t display_frame_crc(void)
 {
-    /* FNV-1a, computed only on explicit diagnostic request. */
+    /* FNV-1a: verification mode only, disabled in the normal fast path. */
     const uint8_t *p = (const uint8_t *)address(front);
     unsigned n = display_width*display_height*3;
     uint32_t v = 2166136261U;

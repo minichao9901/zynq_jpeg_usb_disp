@@ -1,5 +1,7 @@
 # RGB565 首版板测记录
 
+本文记录 `rgb565-baseline-20261106` 的历史基线；当前 JPEG 固件及最新产物身份见 [jpeg-and-throughput.md](jpeg-and-throughput.md)。
+
 日期：2026-11-06，Asia/Shanghai。目标：Zynq-7020 / 800×480 USB Display。
 用户确认本轮未接 LCD，USB OTG 数据口已接本机。
 

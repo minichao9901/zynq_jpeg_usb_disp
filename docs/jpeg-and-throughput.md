@@ -1,6 +1,6 @@
 # JPEG 实现与 USB 吞吐验证
 
-2026-11-06，Asia/Shanghai。RGB565 基线已先提交 `ad341fa` 并打 tag `rgb565-baseline-20261106`。
+2026-11-06，Asia/Shanghai。RGB565 基线已先提交并打 tag `rgb565-baseline-20261106`；清理 reference 历史后，对应提交为 `09186d4`。
 本轮全部为 JTAG/RAM 加载，未写 QSPI，LCD 仍未接。下列图像正确性是物理 DDR 校验，非屏幕拍照。
 
 ## 23MB/s 的原因及分层实测

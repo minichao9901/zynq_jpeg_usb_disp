@@ -16,7 +16,7 @@ python tools/flash.py jpeg
 并验证板端模式、Fps999 与构建 ID；使用 JTAG/RAM，保留原主屏，不写 QSPI。
 详见 [不限帧率产物与 CLI](docs/unrestricted-profiles.md)。
 
-RGB565 基线提交 `ad341fa`，tag 为 `rgb565-baseline-20261106`。
+RGB565 基线提交 `09186d4`，tag 为 `rgb565-baseline-20261106`。
 JPEG 首版及 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)；当前配对验证见 [不限帧率版本](docs/unrestricted-profiles.md)。
 无帧率限制的三轮中位数：纯接收 **41.97 MB/s**，RGB565 转换并提交 VDMA **41.74 MB/s**。
 此前 23 MB/s 来自 30fps 主动限速（800×480×2×30=23.04MB/s），不是 USB 上限。
@@ -72,9 +72,10 @@ python tools/build.py --bsp
 本机 Vivado 2018.3 对原动态时钟 IP 综合发生 `EXCEPTION_ACCESS_VIOLATION`，因此全量 PL 重编译未通过。
 该限制不影响已交付参考 bit 与本次 PS ELF 的板测。
 
-`reference/` 已从 Git 跟踪中移除并加入忽略规则，本地资料保留。
+`reference/` 已从 Git 跟踪及全部历史引用中移除，并加入忽略规则，本地资料保留。
 PL 重建必需的 IP、BD Tcl 和约束已保留在 `fpga/`，构建/下载不再依赖该资料目录。
 来源与目录说明见 [fpga/README.md](fpga/README.md)。
+历史重写后的提交/tag 对照与备份位置见 [Git 历史清理记录](docs/git-history-cleanup.md)。
 
 ## Windows 驱动配置
 

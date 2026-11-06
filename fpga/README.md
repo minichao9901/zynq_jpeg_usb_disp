@@ -11,8 +11,9 @@
 | `ip_repo/axi_dynclk_v1_0/` | 动态时钟自定义 IP 的源码、元数据及驱动 |
 | `ip_repo/rgb2lcd/` | RGB LCD 自定义 IP 的源码和接口定义 |
 
-这些文件按原字节复制，版权说明保留。原始版本可从历史 RGB565 tag
-`rgb565-baseline-20261106` 中核对。本次未改变 RTL 功能或现有 bit/ELF。
+这些文件按原字节复制，版权说明保留。原始资料已从所有 Git 历史引用中清除；
+如需核对来源，可使用本地忽略的 `reference/` 或历史清理前的完整备份。
+备份与提交映射见 `docs/git-history-cleanup.md`。本次未改变 RTL 功能或现有 bit/ELF。
 
 `build.tcl` 使用此处输入建工程、启用 PS USB 并导出 HDF；默认保留已版本管理的
 `prebuilt/usb_display.bit`。需要全量 PL 重编译时使用 `-tclargs --rebuild-pl`，

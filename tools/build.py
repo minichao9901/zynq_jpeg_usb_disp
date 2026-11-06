@@ -79,6 +79,7 @@ def main():
             shutil.copy2(ROOT/'prebuilt'/name,package/name)
         manifest={'schema':1,'mode':mode,'default_encoding':ENCODINGS[mode],
             'fps_limit':None,'driver_fps_token':DRIVER_FPS,'normal_profile_flags':2,
+            'display_update':'frame-boundary-shadow','software_frame_buffers':5,
             'product':product_for(mode),'build_id':'0x'+identity,'compiler':str(gcc),'flags':mode_flags,
             'bit_source':'shared unchanged reference LCD PL','inputs_sha256':inputs,
             'sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in [elf,package/'usb_display.bit',package/'ps7_init.tcl',package/'system.hdf']}}

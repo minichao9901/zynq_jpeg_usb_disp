@@ -1,0 +1,594 @@
+{
+  "passed": true,
+  "mode": "rgb",
+  "transport": "JTAG/RAM",
+  "qspi_written": false,
+  "package": "E:\\zynq_jpeg_usb_disp\\prebuilt\\rgb",
+  "artifacts": {
+    "usb_display.elf": "f5bb98430a009642db0d503a4aef4d63d20292077c68c333aa9de8d6fdaaa6a8",
+    "usb_display.bit": "73f50f93bf252401125aa6ca734237304ebf4090c4d5e1b3398fe4e7f94397ae",
+    "ps7_init.tcl": "7112666d7394812d4e37e1a4f63a0ba80cf21487776d746540bd82eb9310bfe4",
+    "system.hdf": "787f79b3149b1085c50dc45c4fd5c06ff10dd2643c793564b1ce2a79849d0c81"
+  },
+  "product": "zynq_R800x480_Ergb16_Ejpg8_Fps999_Bl4096",
+  "firmware": {
+    "magic": 843337813,
+    "version": 1,
+    "default_encoding": 0,
+    "driver_fps_token": 999,
+    "profile_flags": 2,
+    "build_id": 1331171626,
+    "features": 7,
+    "width": 800,
+    "height": 480
+  },
+  "before_display": {
+    "magic": 827343957,
+    "version": 1,
+    "configured": 1,
+    "resets": 1,
+    "width": 800,
+    "height": 480,
+    "panel": 17284,
+    "usb_bytes": 0,
+    "chunks": 0,
+    "frames": 0,
+    "bad": 0,
+    "unsupported": 0,
+    "display_errors": 0,
+    "last_id": 0,
+    "last_type": 0,
+    "last_x": 0,
+    "last_y": 0,
+    "last_width": 0,
+    "last_height": 0,
+    "last_length": 0,
+    "front": 33554432,
+    "vdma": 65536,
+    "frame_fnv": 0,
+    "ep1_frames": 0,
+    "ep2_frames": 0,
+    "rx_timeouts": 0,
+    "setup": 28,
+    "stalls": 0,
+    "speed": 480,
+    "stage": 3,
+    "session": 2,
+    "resync_bytes": 0
+  },
+  "video_before": {
+    "magic": 827347780,
+    "version": 1,
+    "buffers": 5,
+    "frame_events": 118,
+    "programmed": 33554432,
+    "latest": 33554432,
+    "ready": 0,
+    "drawing": 0,
+    "retired_mask": 0,
+    "decoded": 0,
+    "published": 0,
+    "replaced": 0,
+    "vdma": 65536,
+    "frame_event_age_ms": 16,
+    "halted_seen": 0,
+    "error_seen": 0,
+    "no_buffer": 0,
+    "published_seq": 0,
+    "latest_seq": 0,
+    "guard_events": 2,
+    "settled": 1,
+    "control": 65537
+  },
+  "after_display": {
+    "magic": 827343957,
+    "version": 1,
+    "configured": 1,
+    "resets": 1,
+    "width": 800,
+    "height": 480,
+    "panel": 17284,
+    "usb_bytes": 3856464,
+    "chunks": 236,
+    "frames": 5,
+    "bad": 0,
+    "unsupported": 0,
+    "display_errors": 0,
+    "last_id": 4,
+    "last_type": 0,
+    "last_x": 0,
+    "last_y": 0,
+    "last_width": 800,
+    "last_height": 480,
+    "last_length": 768000,
+    "front": 35651584,
+    "vdma": 65536,
+    "frame_fnv": 0,
+    "ep1_frames": 5,
+    "ep2_frames": 0,
+    "rx_timeouts": 0,
+    "setup": 39,
+    "stalls": 0,
+    "speed": 480,
+    "stage": 3,
+    "session": 2,
+    "resync_bytes": 0
+  },
+  "video_after": {
+    "magic": 827347780,
+    "version": 1,
+    "buffers": 5,
+    "frame_events": 427,
+    "programmed": 35651584,
+    "latest": 35651584,
+    "ready": 0,
+    "drawing": 0,
+    "retired_mask": 1,
+    "decoded": 5,
+    "published": 5,
+    "replaced": 0,
+    "vdma": 65536,
+    "frame_event_age_ms": 3,
+    "halted_seen": 0,
+    "error_seen": 0,
+    "no_buffer": 0,
+    "published_seq": 5,
+    "latest_seq": 5,
+    "guard_events": 2,
+    "settled": 0,
+    "control": 65537
+  },
+  "firmware_after_display": {
+    "magic": 843337813,
+    "version": 1,
+    "default_encoding": 0,
+    "driver_fps_token": 999,
+    "profile_flags": 2,
+    "build_id": 1331171626,
+    "features": 7,
+    "width": 800,
+    "height": 480
+  },
+  "display_layout": {
+    "before": [
+      {
+        "name": "\\\\.\\DISPLAY1",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524293,
+        "mode": {
+          "width": 1920,
+          "height": 1080,
+          "x": 0,
+          "y": 0,
+          "hz": 60
+        }
+      },
+      {
+        "name": "\\\\.\\DISPLAY2",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY3",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY4",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY5",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY6",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY7",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY8",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY9",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY10",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY11",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY12",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY13",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY14",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY15",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY16",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY17",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY18",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      }
+    ],
+    "on_attach": [
+      {
+        "name": "\\\\.\\DISPLAY1",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524293,
+        "mode": {
+          "width": 1920,
+          "height": 1080,
+          "x": 0,
+          "y": 0,
+          "hz": 60
+        }
+      },
+      {
+        "name": "\\\\.\\DISPLAY2",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY3",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY4",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY5",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY6",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY7",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY8",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY9",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY10",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY11",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY12",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY13",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY14",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY15",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY16",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY17",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY18",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY53",
+        "device": "xfz1986_usb_graphic(demo)",
+        "flags": 1,
+        "mode": {
+          "width": 800,
+          "height": 480,
+          "x": -800,
+          "y": 0,
+          "hz": 60
+        }
+      }
+    ],
+    "extended": [
+      {
+        "name": "\\\\.\\DISPLAY1",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524293,
+        "mode": {
+          "width": 1920,
+          "height": 1080,
+          "x": 0,
+          "y": 0,
+          "hz": 60
+        }
+      },
+      {
+        "name": "\\\\.\\DISPLAY2",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY3",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY4",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY5",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY6",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY7",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY8",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY9",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY10",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY11",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY12",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY13",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY14",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY15",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY16",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY17",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY18",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY53",
+        "device": "xfz1986_usb_graphic(demo)",
+        "flags": 1,
+        "mode": {
+          "width": 800,
+          "height": 480,
+          "x": -800,
+          "y": 0,
+          "hz": 60
+        }
+      }
+    ],
+    "usb_available_modes": [
+      [
+        800,
+        480,
+        60
+      ]
+    ],
+    "native_mode_result": 0,
+    "after": [
+      {
+        "name": "\\\\.\\DISPLAY1",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524293,
+        "mode": {
+          "width": 1920,
+          "height": 1080,
+          "x": 0,
+          "y": 0,
+          "hz": 60
+        }
+      },
+      {
+        "name": "\\\\.\\DISPLAY2",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY3",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY4",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY5",
+        "device": "AMD Radeon(TM) Graphics",
+        "flags": 524288
+      },
+      {
+        "name": "\\\\.\\DISPLAY6",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY7",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY8",
+        "device": "Todesk Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY9",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY10",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY11",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY12",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY13",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY14",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY15",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY16",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY17",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY18",
+        "device": "GameViewer Virtual Display Adapter",
+        "flags": 0
+      },
+      {
+        "name": "\\\\.\\DISPLAY53",
+        "device": "xfz1986_usb_graphic(demo)",
+        "flags": 1,
+        "mode": {
+          "width": 800,
+          "height": 480,
+          "x": -800,
+          "y": 0,
+          "hz": 60
+        }
+      }
+    ]
+  }
+}

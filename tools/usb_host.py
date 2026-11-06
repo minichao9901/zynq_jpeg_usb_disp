@@ -55,6 +55,26 @@ def firmware_info(dev):
     return result
 
 
+DISPLAY_KEYS='magic version buffers frame_events programmed latest ready drawing retired_mask decoded published replaced vdma frame_event_age_ms halted_seen error_seen no_buffer published_seq latest_seq guard_events settled control'.split()
+
+
+def display_status(dev):
+    raw=bytes(dev.ctrl_transfer(0xc1,0x35,0,1,128,timeout=3000))
+    result=dict(zip(DISPLAY_KEYS,struct.unpack('<32I',raw)))
+    if result['magic']!=0x31505344: raise RuntimeError('Invalid display telemetry')
+    return result
+
+
+def wait_display(dev,timeout=2):
+    end=time.monotonic()+timeout
+    while time.monotonic()<end:
+        status=display_status(dev)
+        if status['settled'] and status['published_seq']==status['latest_seq']:
+            return stats(dev)
+        time.sleep(.005)
+    raise RuntimeError('Display did not settle: '+str(status))
+
+
 PROFILE_KEYS='version flags frames convert_us jpeg_us flush_us wait_us fnv_us copy_us frame_us last_us max_us jpeg_errors neon sink_frames hz'.split()
 
 

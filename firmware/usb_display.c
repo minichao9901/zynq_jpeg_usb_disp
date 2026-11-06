@@ -194,9 +194,13 @@ static void setup(XUsbPs_SetupData *s)
             snapshot[S_FRONT]=display_front_address();
             snapshot[S_SPEED]=high_speed()?480:12;
             result=send_reply(snapshot,sizeof snapshot,s->wLength);
+        } else if(s->bmRequestType==0xc1 && s->bRequest==0x35 && s->wIndex==1) {
+            uint32_t snapshot[32];
+            display_snapshot(snapshot);
+            result=send_reply(snapshot,sizeof snapshot,s->wLength);
         } else if(s->bmRequestType==0xc1 && s->bRequest==0x34 && s->wIndex==1) {
             uint32_t info[]={0x32445055U,1,UDISP_DEFAULT_ENCODING,UDISP_DRIVER_FPS,
-                profile_flags,UDISP_BUILD_ID,3,display_width,display_height};
+                profile_flags,UDISP_BUILD_ID,7,display_width,display_height};
             result=send_reply(info,sizeof info,s->wLength);
         } else if(s->bmRequestType==0xc1 && s->bRequest==0x31 && s->wIndex==1) {
             uint32_t snapshot[P_COUNT];

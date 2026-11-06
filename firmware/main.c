@@ -23,7 +23,9 @@ int main(void)
     if (result) { udisp_stats[S_STAGE] = 0x90000000U | (unsigned)result; goto failed; }
     udisp_stats[S_STAGE] = 3;
     for (;;) {
+        display_poll();
         usb_display_poll();
+        display_poll();
         XTime_GetTime(&now);
         if (now-last > COUNTS_PER_SECOND*2) {
             last = now;

@@ -1,0 +1,8 @@
+{
+  "included_in_performance": false,
+  "reason": "User confirmed manually downloading JPEG during RGB throughput test",
+  "observed_errors": [
+    "USB pipe error",
+    "SetDisplayConfig error 31 during restore"
+  ]
+}

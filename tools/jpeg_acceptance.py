@@ -8,7 +8,7 @@ import subprocess
 import time
 import usb.util
 from PIL import Image,ImageChops
-from usb_host import connect,stats,frame,wait_for,set_profile,profile,ROOT
+from usb_host import connect,stats,frame,wait_for,set_profile,profile,ROOT,wait_display
 from benchmark import run as benchmark
 
 
@@ -38,7 +38,8 @@ def main():
     def send(data,w,h,x=0,y=0):
         before=stats(dev)
         dev.write(2,frame(data,w,h,x,y,frame_id=before['ep2_frames']&1023,mode=3),timeout=5000)
-        return wait_for(dev,'ep2_frames',before['ep2_frames']+1)
+        wait_for(dev,'ep2_frames',before['ep2_frames']+1)
+        return wait_display(dev)
     try:
         start=stats(dev);time.sleep(.2)
         assert stats(dev)['ep1_frames']==start['ep1_frames'],'Pause IDD MI_00 first'

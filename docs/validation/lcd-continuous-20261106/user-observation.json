@@ -1,0 +1,5 @@
+{
+  "static_color_bars": "色条稳定显示，不再闪",
+  "fixed_dynamic_display": "已经稳定，不再黑闪",
+  "concurrent_download_interruption": "刚才手动重新下载了 JPEG"
+}

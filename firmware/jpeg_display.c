@@ -25,6 +25,7 @@ int jpeg_display(const uint8_t *data,unsigned length,unsigned x,unsigned y,unsig
     errors.pub.error_exit=fail;
     errors.pub.output_message=quiet;
     if(setjmp(errors.jump)) {
+        display_cancel();
         if(decoder.mem) jpeg_destroy_decompress(&decoder);
         profile_add(P_JPEG_US,start);
         return 1;
@@ -46,7 +47,7 @@ int jpeg_display(const uint8_t *data,unsigned length,unsigned x,unsigned y,unsig
         if(jpeg_read_scanlines(&decoder,&row,1)!=1) fail((j_common_ptr)&decoder);
     }
     jpeg_finish_decompress(&decoder);
-    if(errors.pub.num_warnings) { jpeg_destroy_decompress(&decoder); return 1; }
+    if(errors.pub.num_warnings) { display_cancel(); jpeg_destroy_decompress(&decoder); return 1; }
     jpeg_destroy_decompress(&decoder);
     profile_add(P_JPEG_US,start);
     return display_commit(base);

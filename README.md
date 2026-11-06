@@ -18,7 +18,7 @@ python tools/flash.py jpeg
 
 RGB565 基线提交 `09186d4`，tag 为 `rgb565-baseline-20261106`。
 JPEG 首版及 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)；当前配对验证见 [不限帧率版本](docs/unrestricted-profiles.md)。
-无帧率限制的三轮中位数：纯接收 **41.97 MB/s**，RGB565 转换并提交 VDMA **41.74 MB/s**。
+当前连续扫描修复版无帧率限制的三轮中位数：纯接收 **41.84 MB/s**，RGB565 转换处理 **41.71 MB/s**。
 此前 23 MB/s 来自 30fps 主动限速（800×480×2×30=23.04MB/s），不是 USB 上限。
 
 ## 当前交付与验证
@@ -29,8 +29,8 @@ JPEG 首版及 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-t
 - 根目录旧 ELF 是 JPEG 兼容别名；`prebuilt/manifest.json` 索引两套产物，新下载统一使用模式 CLI。
 - 当前板测见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)，RGB565 历史基线见 [docs/validation.md](docs/validation.md)。
 
-屏幕目前未接；已验证 USB、Windows 驱动、RGB565 转换、VDMA 运行及物理 DDR 内容。
-实际 LCD 的颜色、方向、同步稳定性和停止/重启 VDMA 时的观感，需接屏后验收。
+现已接入 800×480 实体 LCD（ID=0x4384）。实屏发现的反复黑屏/亮屏已修复，用户确认动态画面不再黑闪。
+修复保持 VDMA 连续扫描，后台完成完整画面后按帧边界更新地址；详见 [实屏黑闪修复](docs/lcd-continuous-scanout.md)。
 当前采用 JTAG/RAM 下载，断电后需重载；本工程没有写 QSPI。
 
 ## 构建、下载
@@ -154,21 +154,26 @@ JPEG 内部尺寸必须与帧头相同，8-bit、1/3 分量，支持 4:2:0、4:2
 已验证跳过 2049 字节残留数据后恢复下一帧；没有魔数或强制 CRC，仍不宣称任意损坏均能无歧义恢复。
 诊断接口 vendor OUT 请求 `0x32`（wIndex=1）可清理流解析状态；USB 重配置也会清理状态。
 
-VDMA 仍为参考 PL 的一个硬件帧槽。软件使用 0x02000000、0x02200000、0x02400000 三个 BGR888 缓冲；
-先在后台缓冲完成转换并 flush cache，再停 MM2S、等待 halted、切换地址并重启。
+VDMA 仍为参考 PL 的一个硬件帧槽，启动后持续运行，不再为每次换图停启 MM2S。
+软件使用从 0x02000000 起、间隔 0x00200000 的五个 BGR888 缓冲：保护已编程帧及延迟回收的旧读缓冲，
+另设待发布帧和绘制帧。后台完成转换并 flush 后，按 PG020 动态更新 START_ADDRESS、最后写 VSIZE，在帧边界生效。
+生产者快于显示时，替换尚未发布的旧完整帧；不会为追求接收计数而中断 LCD 扫描。
 区域更新先复制原画面以保留区域外内容。生产路径默认关闭整帧 FNV-1a；板测显式启用后进行指纹验证。
 原每帧 FNV 约耗时 9.9ms，是无节流 RGB 链路约 29.4MB/s 的主要附加开销。
 
 诊断 vendor IN `0x30`（bmRequestType=0xC1,wIndex=1）返回 32 个小端 uint32，字段顺序见
 `firmware/usb_display.h` 和 `tools/usb_host.py`。`frame_fnv` 为 FNV-1a，非线协议 CRC。
 该字段只在 FNV 验证模式下更新，正常模式下可能保留旧值。
+FNV 对应最新完成解码的画面；物理 DDR 校验会通过 `wait_display()` 等待最终画面发布并跨过保护帧边界。
 
 诊断 IN `0x31` 返回耗时统计，OUT `0x33` 的 wValue 选择模式：0=显示+FNV，1=纯接收，2=正常显示不算 FNV（默认）。
 索引见 `firmware/profile.h`，累计耗时单位为微秒。仅在暂停 IDD、无在途测试帧时切换诊断模式。
+诊断 IN `0x35` 返回连续扫描状态：帧边界事件、已发布/最新地址、待发布/绘制地址、旧读缓冲保护掩码、
+已解码/已发布/被替换计数、停止/错误观测和运行位。CLI 也检查视频帧边界正在前进，避免只验 USB 收包。
 
 当前 JPEG 渐变测试图连续 300 帧不限速约 72.8 次解码/提交每秒；高熵噪声图约 26.2fps。
 复杂图像不保证 30fps，瓶颈是 CPU 解码。若要求任意这类图像都超过 30fps，需要进一步做 PL 硬件解码。
-这些数字表示软件处理和 VDMA 提交能力，不是未接 LCD 的面板刷新率实测。
+这些数字表示接收/解码处理能力，不是面板刷新率；LCD 按视频时序显示，较旧的待发布帧可能被较新完整帧替换。
 
 ## 移植要点
 

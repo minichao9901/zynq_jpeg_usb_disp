@@ -21,6 +21,7 @@ class PackageTests(unittest.TestCase):
         for name in flash.FILES: (self.package/name).write_bytes(name.encode())
         self.manifest={'schema':1,'mode':'rgb','default_encoding':0,'fps_limit':None,
             'driver_fps_token':999,'normal_profile_flags':2,'product':product_for('rgb'),'build_id':'0x12345678',
+            'display_update':'frame-boundary-shadow','software_frame_buffers':5,
             'sha256':{name:hashlib.sha256((self.package/name).read_bytes()).hexdigest() for name in flash.FILES}}
         self.save()
 
@@ -46,6 +47,10 @@ class PackageTests(unittest.TestCase):
     def test_reject_extra_path(self):
         self.manifest['sha256']['../other.elf']='0'*64;self.save()
         with self.assertRaises(ValueError): flash.validate_package(self.package,'rgb')
+
+    def test_reject_stop_start_display_profile(self):
+        self.manifest.pop('display_update');self.save()
+        with self.assertRaisesRegex(ValueError,'continuous'): flash.validate_package(self.package,'rgb')
 
     def test_dry_run_never_downloads(self):
         with mock.patch.object(sys,'argv',['flash.py','rgb','--dry-run']),mock.patch.object(flash,'flash') as download,contextlib.redirect_stdout(io.StringIO()):

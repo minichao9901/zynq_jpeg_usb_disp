@@ -28,6 +28,8 @@ def validate_package(package,mode):
     if manifest.get('fps_limit','missing') is not None or manifest.get('driver_fps_token')!=DRIVER_FPS or manifest.get('normal_profile_flags')!=2:
         raise ValueError('Package does not declare the unrestricted optimized release policy')
     if manifest.get('product')!=product_for(mode): raise ValueError('Unexpected USB product string')
+    if manifest.get('display_update')!='frame-boundary-shadow' or manifest.get('software_frame_buffers')!=5:
+        raise ValueError('Package does not declare continuous VDMA scanout')
     if not 0<=int(manifest['build_id'],0)<=0xffffffff: raise ValueError('Invalid build identity')
     hashes=manifest.get('sha256',{})
     if set(hashes)!=FILES: raise ValueError('Package must contain exactly the four expected artifact hashes')
@@ -66,7 +68,7 @@ def run_logged(command,log):
 
 def wait_for_board(manifest):
     import usb.util
-    from usb_host import connect,stats,firmware_info
+    from usb_host import connect,stats,firmware_info,display_status
     deadline=time.monotonic()+12;last='not enumerated'
     while time.monotonic()<deadline:
         dev=None
@@ -77,7 +79,10 @@ def wait_for_board(manifest):
                 raise RuntimeError('Running firmware identity does not match the requested package')
             if state['configured']!=1 or state['speed']!=480 or state['stage']!=3:
                 raise RuntimeError('USB high-speed configuration is not ready')
-            return info,state
+            video=display_status(dev)
+            if not info['features']&4 or not video['control']&1 or video['frame_events']==0 or video['frame_event_age_ms']>100 or video['halted_seen'] or video['error_seen']:
+                raise RuntimeError('Continuous LCD scanout is not ready: '+str(video))
+            return info,state,video
         except Exception as e:
             last=str(e);time.sleep(.2)
         finally:
@@ -88,7 +93,7 @@ def wait_for_board(manifest):
 def flash(mode,package,manifest,no_display):
     import winreg
     import usb.util
-    from usb_host import connect,stats,firmware_info
+    from usb_host import connect,stats,firmware_info,display_status
     logdir=ROOT/'build/flash'/datetime.now().strftime('%Y%m%d-%H%M%S-%f')
     logdir.mkdir(parents=True,exist_ok=False)
     report={'passed':False,'mode':mode,'transport':'JTAG/RAM','qspi_written':False,
@@ -110,8 +115,9 @@ def flash(mode,package,manifest,no_display):
         print(f'Downloading {mode.upper()} bit + ELF through JTAG/RAM...',flush=True)
         run_logged([sys.executable,ROOT/'tools/run_xsct.py',ROOT/'tools/load.tcl',package/'usb_display.elf',
                     package/'usb_display.bit',package/'ps7_init.tcl'],logdir/'download.log')
-        info,before=wait_for_board(manifest)
+        info,before,video_before=wait_for_board(manifest)
         report['firmware']=info;report['before_display']=before
+        report['video_before']=video_before
         node=display_node()
         if no_display:
             if node and node['Status']=='OK': run_logged(['pnputil','/disable-device',node['InstanceId']],logdir/'disable-idd-final.log')
@@ -122,10 +128,14 @@ def flash(mode,package,manifest,no_display):
                 deadline=time.monotonic()+8
                 while time.monotonic()<deadline:
                     after=stats(dev)
-                    if after['ep1_frames']>before['ep1_frames'] and after['last_type']==ENCODINGS[mode]: break
+                    video=display_status(dev)
+                    if after['ep1_frames']>before['ep1_frames'] and after['last_type']==ENCODINGS[mode] and video['published']>video_before['published']: break
                     time.sleep(.1)
                 else: raise RuntimeError('IDD did not deliver the requested RGB/JPEG frame type')
                 report['after_display']=after
+                report['video_after']=video
+                if video['halted_seen'] or video['error_seen'] or not video['control']&1:
+                    raise RuntimeError('LCD scanout stopped or faulted: '+str(video))
                 report['firmware_after_display']=firmware_info(dev)
             finally: usb.util.dispose_resources(dev)
             layout=ROOT/'build/display-enabled.json'

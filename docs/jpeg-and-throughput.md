@@ -1,5 +1,7 @@
 # JPEG 实现与 USB 吞吐验证
 
+这是未接实体屏时的首轮历史记录。实屏发现的停启 VDMA 黑闪问题及当前修复见 [连续扫描修复](lcd-continuous-scanout.md)。
+
 2026-11-06，Asia/Shanghai。RGB565 基线已先提交并打 tag `rgb565-baseline-20261106`；清理 reference 历史后，对应提交为 `09186d4`。
 本轮全部为 JTAG/RAM 加载，未写 QSPI，LCD 仍未接。下列图像正确性是物理 DDR 校验，非屏幕拍照。
 

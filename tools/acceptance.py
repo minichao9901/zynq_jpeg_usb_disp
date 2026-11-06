@@ -7,7 +7,7 @@ from pathlib import Path
 import struct
 import subprocess
 import time
-from usb_host import connect, stats, frame, pattern, fnv, rgb_to_bgr, wait_for, ROOT,set_profile
+from usb_host import connect, stats, frame, pattern, fnv, rgb_to_bgr, wait_for, ROOT,set_profile,wait_display,display_status
 import usb.util
 
 
@@ -34,7 +34,8 @@ def main():
         else:
             dev.write(2,packet,timeout=5000)
         key='unsupported' if mode else 'ep2_frames'
-        return wait_for(dev,key,start[key]+1)
+        result=wait_for(dev,key,start[key]+1)
+        return result if mode else wait_display(dev)
     def check(name,s,expected):
         expected_fnv=fnv(expected)
         assert s['frame_fnv']==expected_fnv, (name,s,expected_fnv)
@@ -65,7 +66,8 @@ def main():
         p1=pattern(w,h,2); p2=pattern(w,h,3)
         dev.write(2,frame(p1,w,h,frame_id=900)+frame(p2,w,h,frame_id=901),timeout=5000)
         expected=rgb_to_bgr(p2)
-        check('two concatenated frames',wait_for(dev,'ep2_frames',start['ep2_frames']+2),expected)
+        wait_for(dev,'ep2_frames',start['ep2_frames']+2)
+        check('two concatenated frames',wait_display(dev),expected)
         # A rejected RGB rectangle is drained without overwriting scanout.
         start=stats(dev)
         dev.write(2,frame(b'\x00\x00'*16,4,4,w-1,h-1),timeout=3000)
@@ -96,6 +98,7 @@ def main():
                 delay=(i+1)/args.fps-(time.monotonic()-t0)
                 if delay>0: time.sleep(delay)
         s=wait_for(dev,'ep2_frames',start['ep2_frames']+args.frames,timeout=10)
+        s=wait_display(dev)
         elapsed=time.monotonic()-t0
         check('sustained 800x480 RGB565, unrestricted unless --fps is supplied',s,expected)
         assert s['bad']==start['bad'] and s['rx_timeouts']==start['rx_timeouts'],s
@@ -125,6 +128,8 @@ def main():
         from PIL import Image
         Image.frombytes('RGB',(w,h),actual,'raw','BGR').save(args.out/'scanout.png')
         report['final']=stats(dev)
+        report['display']=display_status(dev)
+        assert report['display']['halted_seen']==0 and report['display']['error_seen']==0 and report['display']['no_buffer']==0,report['display']
         report['passed']=True
         save()
         print(json.dumps(report,indent=2))

@@ -13,6 +13,10 @@ default/preferred encoding. The CLI selects the corresponding host configuration
 The BIT files are byte-identical because both modes use the same unchanged LCD
 PL. They are intentionally included in both self-contained pairs. The ELFs are
 different and report their mode/build identity through vendor request 0x34.
+The current profiles keep MM2S running and use frame-boundary shadow updates.
+Five software buffers protect scanout/retired readers and allow replacement of
+old queued frames. The CLI rejects older stop/start display profiles and checks
+live frame-boundary progress through vendor request 0x35.
 Git newline conversion is disabled in `prebuilt/` so the PS init script's
 SHA-256 remains stable when checking out the committed package on Windows.
 

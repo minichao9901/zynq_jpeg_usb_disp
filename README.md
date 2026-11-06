@@ -5,17 +5,28 @@
 JPEG 使用 Cortex-A9 Neon 加速的 libjpeg-turbo 3.1.2，直接解码到后台 BGR888 帧缓冲。
 PL 仍复用 LCD 参考例程，本版没有新增 RTL。
 
+**当前交付：两套不限帧率的 bit+ELF，已分别上板验证。**
+
+```powershell
+python tools/flash.py rgb
+python tools/flash.py jpeg
+```
+
+产物分别在 `prebuilt/rgb/`、`prebuilt/jpeg/`。CLI 会选取配套 bit/ELF、同步 Windows 驱动参数，
+并验证板端模式、Fps999 与构建 ID；使用 JTAG/RAM，保留原主屏，不写 QSPI。
+详见 [不限帧率产物与 CLI](docs/unrestricted-profiles.md)。
+
 RGB565 基线提交 `ad341fa`，tag 为 `rgb565-baseline-20261106`。
-当前 JPEG 版本的板测与 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)。
+JPEG 首版及 USB 吞吐分析见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)；当前配对验证见 [不限帧率版本](docs/unrestricted-profiles.md)。
 无帧率限制的三轮中位数：纯接收 **41.97 MB/s**，RGB565 转换并提交 VDMA **41.74 MB/s**。
 此前 23 MB/s 来自 30fps 主动限速（800×480×2×30=23.04MB/s），不是 USB 上限。
 
 ## 当前交付与验证
 
-- `prebuilt/usb_display.bit`：直接复用 `reference/19_vdma_lcd` 提供的 LCD bitstream，PL 未改动。
-- `prebuilt/usb_display.elf`：本工程重新编译的 PS USB Display 固件。
-- `prebuilt/system.hdf`、`prebuilt/ps7_init.tcl`：增加 PS USB 的硬件描述与初始化文件。
-- `prebuilt/manifest.json`：源码、BSP 库、bit/ELF/HDF/初始化文件的 SHA-256。
+- `prebuilt/rgb/usb_display.bit`、`usb_display.elf`：RGB565 默认模式。
+- `prebuilt/jpeg/usb_display.bit`、`usb_display.elf`：JPEG 默认模式。
+- 每套包含配套 HDF、PS init、manifest 和文件哈希；PL 相同，因此两份 bit 内容一致，ELF 不同。
+- 根目录旧 ELF 是 JPEG 兼容别名；`prebuilt/manifest.json` 索引两套产物，新下载统一使用模式 CLI。
 - 当前板测见 [docs/jpeg-and-throughput.md](docs/jpeg-and-throughput.md)，RGB565 历史基线见 [docs/validation.md](docs/validation.md)。
 
 屏幕目前未接；已验证 USB、Windows 驱动、RGB565 转换、VDMA 运行及物理 DDR 内容。
@@ -34,8 +45,9 @@ python tools/build.py
 # 从交付 HDF 重新生成并编译 BSP、固件
 python tools/build.py --bsp
 
-# 板子上电、JTAG 与 USB OTG 数据口接好后，下载 bit + ELF
-./tools/load.ps1
+# 板子上电、JTAG 与 USB OTG 数据口接好后，选择下载模式
+python tools/flash.py rgb
+python tools/flash.py jpeg
 
 # 查询枚举、速度、帧计数和 VDMA 状态
 python tools/usb_host.py stats
@@ -69,7 +81,8 @@ python tools/build.py --bsp
 | MI_00 | USB Display | OUT 0x01 / IN 0x81，`xfz1986_usb_graphic` |
 | MI_01 | 诊断及测试送帧 | OUT 0x02 / IN 0x82，MS OS 2.0 自动绑定 WinUSB |
 
-产品串为 `zynq_R800x480_Ejpg8_Ergb16_Fps30_Bl4096`，优先使用 JPEG，质量参数 8。
+JPEG 产品串为 `zynq_R800x480_Ejpg8_Ergb16_Fps999_Bl4096`，RGB 产品串交换两个 E 项的先后顺序。
+Fps999 让参考驱动绕过低帧率丢帧逻辑，不要求软件达到 999fps；不再施加 30fps 限速。
 `Bl4096` 表示缓冲上限 4096KiB，并非行数。帧头实际长度字段最大为 4MiB−1。
 原 ESP32 工程说明中的全局注册表 `udisp` 会覆盖产品串，本次已备份旧值并设置为本产品串：
 
@@ -105,11 +118,11 @@ python tools/usb_host.py colorbars
 ./tools/benchmark.ps1
 ```
 
-测试覆盖整帧、分片头/短包、跨传输帧、区域更新、越界区域拒绝、非 RGB 类型拒绝、中途残留数据后重新同步、
-截断帧超时恢复、连续 300 帧 30fps，以及 MEM-AP0 物理读回整张 BGR888 scanout 帧缓冲逐字节比较。
+测试覆盖整帧、分片头/短包、跨传输帧、区域更新、越界区域拒绝、坏 JPEG 拒绝、中途残留数据后重新同步、
+截断帧超时恢复、连续 300 帧不限速发送，以及 MEM-AP0 物理读回整张 BGR888 scanout 帧缓冲逐字节比较。
 负向测试会故意增加 `bad`、`rx_timeouts` 等计数；暂停/恢复 IDD 也可能中止其在途帧并增加超时计数。
 应比较正常持续流期间的增量，不能把测试后的累计计数当作正常流量故障。
-Windows 桌面本身的内容变化决定 IDD 发送帧率；合成流测试的 30fps 不能代替所有桌面场景的测量。
+Windows 桌面内容变化和显示刷新决定 IDD 提供帧的速率；需要总线极限时用 `tools/benchmark.ps1` 持续发送测试帧。
 
 ## 数据链路与协议
 
@@ -148,7 +161,7 @@ VDMA 仍为参考 PL 的一个硬件帧槽。软件使用 0x02000000、0x0220000
 诊断 IN `0x31` 返回耗时统计，OUT `0x33` 的 wValue 选择模式：0=显示+FNV，1=纯接收，2=正常显示不算 FNV（默认）。
 索引见 `firmware/profile.h`，累计耗时单位为微秒。仅在暂停 IDD、无在途测试帧时切换诊断模式。
 
-JPEG 渐变测试图连续 300 帧稳定约 30fps，不限速约 72.7 次解码/提交每秒；高熵噪声图约 26.2fps。
+当前 JPEG 渐变测试图连续 300 帧不限速约 72.8 次解码/提交每秒；高熵噪声图约 26.2fps。
 复杂图像不保证 30fps，瓶颈是 CPU 解码。若要求任意这类图像都超过 30fps，需要进一步做 PL 硬件解码。
 这些数字表示软件处理和 VDMA 提交能力，不是未接 LCD 的面板刷新率实测。
 

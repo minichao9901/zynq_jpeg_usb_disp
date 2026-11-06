@@ -31,6 +31,7 @@ def fixture(w,h):
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--out',type=Path,default=ROOT/'build/jpeg-acceptance')
+    ap.add_argument('--fps',type=float,default=0,help='optional test pacing; default is unrestricted')
     args=ap.parse_args();out=args.out;out.mkdir(parents=True,exist_ok=True)
     dev=connect();report={'passed':False,'images':[],'negative_tests':[]}
     def save(): (out/'report.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -87,8 +88,8 @@ def main():
             report['negative_tests'].append(name)
             send(valid,w,h)
         set_profile(dev,2)
-        report['paced_30fps']=benchmark(dev,valid,3,300,1,30)
-        report['paced_30fps']['profile']=profile(dev)
+        report['stream']=benchmark(dev,valid,3,300,1,args.fps)
+        report['stream']['profile']=profile(dev)
         set_profile(dev,2)
         report['unpaced']=benchmark(dev,valid,3,128,8,0)
         report['unpaced']['profile']=profile(dev)

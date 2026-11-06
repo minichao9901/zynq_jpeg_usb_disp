@@ -1,9 +1,17 @@
 # JTAG/RAM only. Never writes QSPI or other nonvolatile storage.
 set root [file normalize [file join [file dirname [info script]] ..]]
-set bit [file join $root prebuilt usb_display.bit]
-if {[llength $argv] == 1} {set bit [file normalize [lindex $argv 0]]}
-set elf [file join $root prebuilt usb_display.elf]
-foreach f [list $bit $elf [file join $root prebuilt ps7_init.tcl]] {
+set bit [file join $root prebuilt jpeg usb_display.bit]
+set elf [file join $root prebuilt jpeg usb_display.elf]
+set init [file join $root prebuilt jpeg ps7_init.tcl]
+if {[llength $argv] == 3} {
+    lassign $argv elf bit init
+    set elf [file normalize $elf]
+    set bit [file normalize $bit]
+    set init [file normalize $init]
+} elseif {[llength $argv] == 1} {
+    set bit [file normalize [lindex $argv 0]]
+} elseif {[llength $argv] != 0} {error "Expected ELF BIT PS_INIT_TCL, or no arguments for JPEG"}
+foreach f [list $bit $elf $init] {
     if {![file exists $f]} {error "Missing artifact $f"}
 }
 connect -url tcp:127.0.0.1:3121
@@ -18,7 +26,7 @@ if {[catch {targets -set -filter {name =~ "APU"}}]} {
 }
 rst -system
 after 1000
-source [file join $root prebuilt ps7_init.tcl]
+source $init
 ps7_init
 ps7_post_config
 targets -set -filter {name =~ "xc7z020"}

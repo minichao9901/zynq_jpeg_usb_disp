@@ -7,13 +7,14 @@ import time
 import winreg
 import usb.util
 from usb_host import connect,stats,ROOT
+from mode_config import product_for
 
 KEY=r'SYSTEM\CurrentControlSet\Services\xfz1986_usb_graphic\Parameters'
 
 
 def main():
     ap=argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('mode',choices=['rgb565','jpeg'])
+    ap.add_argument('mode',choices=['rgb','rgb565','jpeg'])
     ap.add_argument('--quality',type=int,choices=range(1,11),default=8)
     args=ap.parse_args()
     raw=subprocess.check_output(['powershell','-NoProfile','-Command',
@@ -24,7 +25,7 @@ def main():
     dev=connect()
     before=stats(dev)
     usb.util.dispose_resources(dev)
-    product=f'zynq_R800x480_Ejpg{args.quality}_Ergb16_Fps30_Bl4096' if args.mode=='jpeg' else 'zynq_R800x480_Ergb16_Ejpg8_Fps30_Bl4096'
+    product=product_for(args.mode,args.quality)
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,KEY,0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
         try: old,old_type=winreg.QueryValueEx(key,'udisp')
         except FileNotFoundError: old=None;old_type=winreg.REG_SZ

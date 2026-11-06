@@ -1,0 +1,30 @@
+{
+  "rgb": {
+    "mode": "rgb",
+    "build_id": "0x4d9dd968",
+    "default_encoding": 0,
+    "driver_fps_token": 999,
+    "fps_limit": null,
+    "product": "zynq_R800x480_Ergb16_Ejpg8_Fps999_Bl4096",
+    "sha256": {
+      "usb_display.elf": "1ddc2ca4d907795ba9a1913786c78dbe445a8cf38bfb1f08fff36bafebba796f",
+      "usb_display.bit": "73f50f93bf252401125aa6ca734237304ebf4090c4d5e1b3398fe4e7f94397ae",
+      "ps7_init.tcl": "7112666d7394812d4e37e1a4f63a0ba80cf21487776d746540bd82eb9310bfe4",
+      "system.hdf": "787f79b3149b1085c50dc45c4fd5c06ff10dd2643c793564b1ce2a79849d0c81"
+    }
+  },
+  "jpeg": {
+    "mode": "jpeg",
+    "build_id": "0xef09640e",
+    "default_encoding": 3,
+    "driver_fps_token": 999,
+    "fps_limit": null,
+    "product": "zynq_R800x480_Ejpg8_Ergb16_Fps999_Bl4096",
+    "sha256": {
+      "usb_display.elf": "34c4cc1448709f80adf6289641f155b9b975e7109a26bebd97ce61f32bc63628",
+      "usb_display.bit": "73f50f93bf252401125aa6ca734237304ebf4090c4d5e1b3398fe4e7f94397ae",
+      "ps7_init.tcl": "7112666d7394812d4e37e1a4f63a0ba80cf21487776d746540bd82eb9310bfe4",
+      "system.hdf": "787f79b3149b1085c50dc45c4fd5c06ff10dd2643c793564b1ce2a79849d0c81"
+    }
+  }
+}

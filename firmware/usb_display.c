@@ -14,6 +14,7 @@
 #include "sleep.h"
 #include "profile.h"
 #include "jpeg_display.h"
+#include "build_config.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -193,6 +194,10 @@ static void setup(XUsbPs_SetupData *s)
             snapshot[S_FRONT]=display_front_address();
             snapshot[S_SPEED]=high_speed()?480:12;
             result=send_reply(snapshot,sizeof snapshot,s->wLength);
+        } else if(s->bmRequestType==0xc1 && s->bRequest==0x34 && s->wIndex==1) {
+            uint32_t info[]={0x32445055U,1,UDISP_DEFAULT_ENCODING,UDISP_DRIVER_FPS,
+                profile_flags,UDISP_BUILD_ID,3,display_width,display_height};
+            result=send_reply(info,sizeof info,s->wLength);
         } else if(s->bmRequestType==0xc1 && s->bRequest==0x31 && s->wIndex==1) {
             uint32_t snapshot[P_COUNT];
             memcpy(snapshot,(const void *)udisp_profile,sizeof snapshot);
@@ -294,7 +299,13 @@ int usb_display_init(void)
     XUsbPs_DeviceConfig dc={0};
     unsigned ep;
     unsigned mio;
-    snprintf(product,sizeof product,"zynq_R%ux%u_Ejpg8_Ergb16_Fps30_Bl4096",(unsigned)display_width,(unsigned)display_height);
+    snprintf(product,sizeof product,
+#if UDISP_DEFAULT_ENCODING == 0
+        "zynq_R%ux%u_Ergb16_Ejpg8_Fps%u_Bl4096",
+#else
+        "zynq_R%ux%u_Ejpg8_Ergb16_Fps%u_Bl4096",
+#endif
+        (unsigned)display_width,(unsigned)display_height,(unsigned)UDISP_DRIVER_FPS);
     make_msos();
     udisp_profile[P_NEON]=jpeg_neon_available();
     if(!cfg || !icfg) return 1;

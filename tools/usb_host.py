@@ -47,6 +47,14 @@ def stats(dev):
     return result
 
 
+def firmware_info(dev):
+    raw=bytes(dev.ctrl_transfer(0xc1,0x34,0,1,36,timeout=3000))
+    if len(raw)!=36: raise RuntimeError('Short firmware identity reply')
+    result=dict(zip('magic version default_encoding driver_fps_token profile_flags build_id features width height'.split(),struct.unpack('<9I',raw)))
+    if result['magic']!=0x32445055: raise RuntimeError('Invalid firmware identity')
+    return result
+
+
 PROFILE_KEYS='version flags frames convert_us jpeg_us flush_us wait_us fnv_us copy_us frame_us last_us max_us jpeg_errors neon sink_frames hz'.split()
 
 

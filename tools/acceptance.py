@@ -15,6 +15,7 @@ def main():
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--out',type=Path,default=ROOT/'build/acceptance')
     ap.add_argument('--frames',type=int,default=300)
+    ap.add_argument('--fps',type=float,default=0,help='optional test pacing; default 0 sends as fast as possible')
     args=ap.parse_args()
     args.out.mkdir(parents=True,exist_ok=True)
     report={'passed':False,'tests':[]}
@@ -85,20 +86,21 @@ def main():
         payload=pattern(w,h,5); expected=rgb_to_bgr(payload)
         check('recover a new frame after mid-payload garbage',send(payload,w,h),expected)
         assert stats(dev)['resync_bytes']>=start['resync_bytes']+2049
-        # Sustained paced transport, measured after all frames reach scanout.
+        # Sustained transport, unpaced by default; wait for every submitted frame.
         packet=bytearray(frame(payload,w,h))
         start=stats(dev); t0=time.monotonic()
         for i in range(args.frames):
             struct.pack_into('<I',packet,12,(len(payload)<<10)|(i&1023))
             dev.write(2,packet,timeout=5000)
-            delay=(i+1)/30-(time.monotonic()-t0)
-            if delay>0: time.sleep(delay)
+            if args.fps:
+                delay=(i+1)/args.fps-(time.monotonic()-t0)
+                if delay>0: time.sleep(delay)
         s=wait_for(dev,'ep2_frames',start['ep2_frames']+args.frames,timeout=10)
         elapsed=time.monotonic()-t0
-        check('sustained 800x480 RGB565, paced at 30 fps',s,expected)
+        check('sustained 800x480 RGB565, unrestricted unless --fps is supplied',s,expected)
         assert s['bad']==start['bad'] and s['rx_timeouts']==start['rx_timeouts'],s
         report['stream']={'frames':args.frames,'seconds':elapsed,'fps':args.frames/elapsed,
-                          'MBps':args.frames*len(packet)/elapsed/1e6,'stats':s}
+                          'MBps':args.frames*len(packet)/elapsed/1e6,'paced_fps':args.fps,'stats':s}
         # Verify actual physical DDR through MEM-AP0, bypassing CPU caches.
         binary=args.out/'scanout.bgr'
         script=args.out/'read-scanout.tcl'

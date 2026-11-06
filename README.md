@@ -61,7 +61,7 @@ python tools/set_mode.py rgb565
 加载 PL，再启动 Cortex-A9 #0；本应用只向 #0 下载。
 `load.ps1` 在下载前暂停 IDD，完成后通过扩展模式恢复，保留原主屏。
 
-若需要从 LCD 参考工程重新导出 PS 配置：
+若需要使用仓库内的精简 PL 源码重新导出 PS 配置：
 
 ```powershell
 python tools/run_vivado.py -mode batch -source fpga/build.tcl -log build/hardware.log
@@ -71,6 +71,10 @@ python tools/build.py --bsp
 默认复用已提供的 LCD bit，只生成 PS 硬件描述。`-tclargs --rebuild-pl` 可要求重新综合整个 PL；
 本机 Vivado 2018.3 对原动态时钟 IP 综合发生 `EXCEPTION_ACCESS_VIOLATION`，因此全量 PL 重编译未通过。
 该限制不影响已交付参考 bit 与本次 PS ELF 的板测。
+
+`reference/` 已从 Git 跟踪中移除并加入忽略规则，本地资料保留。
+PL 重建必需的 IP、BD Tcl 和约束已保留在 `fpga/`，构建/下载不再依赖该资料目录。
+来源与目录说明见 [fpga/README.md](fpga/README.md)。
 
 ## Windows 驱动配置
 

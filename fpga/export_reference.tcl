@@ -9,5 +9,6 @@ validate_bd_design
 save_bd_design
 generate_target all [get_files system.bd]
 write_hwdef -force -file [file join $root prebuilt system.hdf]
-file copy -force [file join $root reference 19_vdma_lcd vdma_lcd.runs impl_1 system_wrapper.bit] [file join $root prebuilt usb_display.bit]
+# PL is unchanged; keep the versioned shared bitstream.
+if {![file exists [file join $root prebuilt usb_display.bit]]} {error "Missing shared prebuilt LCD bitstream"}
 exit

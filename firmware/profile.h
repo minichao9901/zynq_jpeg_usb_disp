@@ -4,7 +4,8 @@
 #include "xtime_l.h"
 enum { P_VERSION, P_FLAGS, P_FRAMES, P_CONVERT_US, P_JPEG_US, P_FLUSH_US,
        P_WAIT_US, P_FNV_US, P_COPY_US, P_FRAME_US, P_LAST_US, P_MAX_US,
-       P_JPEG_ERRORS, P_NEON, P_SINK_FRAMES, P_HZ, P_COUNT=32 };
+       P_JPEG_ERRORS, P_NEON, P_SINK_FRAMES, P_HZ, P_JPEG_RTL, P_JPEG_HW_STATUS,
+       P_JPEG_HW_CYCLES, P_COUNT=32 };
 #define PROFILE_RX_ONLY 1U
 #define PROFILE_NO_FNV 2U
 extern volatile unsigned profile_flags;

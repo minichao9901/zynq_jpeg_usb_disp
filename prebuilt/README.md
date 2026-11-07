@@ -1,9 +1,15 @@
 # Unrestricted RGB/JPEG release pairs
 
+The RTL branch delivers `jpeg-rtl/` and `rgb-rtl/`, each with a matched BIT,
+ELF, HDF, PS init and SHA-256 manifest. They share the RTL JPEG design and differ
+in default USB encoding. Use `python tools/flash.py jpeg --dry-run` or
+`python tools/flash.py rgb --dry-run` for offline package verification.
+The pairs below are the earlier board-validated NEON builds.
+
 | Default Windows encoding | BIT | ELF | Download |
 | --- | --- | --- | --- |
-| RGB565 | `rgb/usb_display.bit` | `rgb/usb_display.elf` | `python tools/flash.py rgb` |
-| JPEG | `jpeg/usb_display.bit` | `jpeg/usb_display.elf` | `python tools/flash.py jpeg` |
+| RGB565 | `rgb/usb_display.bit` | `rgb/usb_display.elf` | `python tools/flash.py rgb --legacy` |
+| JPEG | `jpeg/usb_display.bit` | `jpeg/usb_display.elf` | `python tools/flash.py jpeg --legacy` |
 
 Each directory also contains its paired `ps7_init.tcl`, `system.hdf`, and
 `manifest.json` with SHA-256 values, source/build inputs, and runtime build ID.

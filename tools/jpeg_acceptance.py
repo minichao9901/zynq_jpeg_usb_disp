@@ -10,6 +10,7 @@ import usb.util
 from PIL import Image,ImageChops
 from usb_host import connect,stats,frame,wait_for,set_profile,profile,ROOT,wait_display
 from benchmark import run as benchmark
+from jpeg_rtl_sim import gradient
 
 
 def read_ddr(address,w,h,out):
@@ -45,13 +46,20 @@ def main():
         assert stats(dev)['ep1_frames']==start['ep1_frames'],'Pause IDD MI_00 first'
         set_profile(dev,0)
         report['initial']=stats(dev)
-        assert profile(dev)['neon']==1
-        w,h=start['width'],start['height'];source=fixture(w,h)
+        decoder=profile(dev)
+        rtl=decoder['jpeg_rtl']==1
+        assert decoder['neon']==int(not rtl)
+        report['jpeg_decoder']='pl-rtl' if rtl else 'neon'
+        w,h=start['width'],start['height'];source=gradient(w,h) if rtl else fixture(w,h)
         variants=[('420_q80',source,{'subsampling':2,'quality':80}),
                   ('422_q95',source,{'subsampling':1,'quality':95}),
                   ('444_q90',source,{'subsampling':0,'quality':90}),
-                  ('progressive',source,{'subsampling':2,'quality':80,'progressive':True}),
                   ('grayscale',source.convert('L'),{'quality':85})]
+        progressive=out/'progressive.jpg'
+        if rtl:
+            source.save(progressive,subsampling=2,quality=80,progressive=True)
+        else:
+            variants.append(('progressive',source,{'subsampling':2,'quality':80,'progressive':True}))
         for name,im,options in variants:
             path=out/(name+'.jpg');im.save(path,**options);data=path.read_bytes()
             expected=Image.open(io.BytesIO(data)).convert('RGB')
@@ -61,13 +69,15 @@ def main():
             diff=ImageChops.difference(expected,actual)
             max_error=max(v[1] for v in diff.getextrema())
             mean_error=sum(diff.tobytes())/(w*h*3)
-            assert max_error<=3 and mean_error<=.25,(name,max_error,mean_error)
+            maximum,mean=(8,2) if rtl else (3,.25)
+            assert max_error<=maximum and mean_error<=mean,(name,max_error,mean_error)
             actual.save(out/(name+'.png'))
             item={'name':name,'jpeg_bytes':len(data),'max_channel_error':max_error,'mean_channel_error':mean_error,
                   'ddr_sha256':hashlib.sha256(actual_data).hexdigest(),'stats':s,'profile':profile(dev)}
             report['images'].append(item);save();print(name,'PASS',max_error,mean_error,flush=True)
         # A non-aligned rectangle verifies row addressing and preservation outside the JPEG.
-        rw,rh,x,y=127,83,13,17;patch=fixture(rw,rh);path=out/'rectangle.jpg';patch.save(path,quality=90,subsampling=0)
+        rw,rh,x,y=127,83,13,17;patch=gradient(rw,rh) if rtl else fixture(rw,rh)
+        path=out/'rectangle.jpg';patch.save(path,quality=90,subsampling=0)
         before_data=actual_data
         s=send(path.read_bytes(),rw,rh,x,y)
         actual_data=read_ddr(s['front'],w,h,out/'rectangle.bgr')
@@ -75,12 +85,14 @@ def main():
         expected.paste(Image.open(path).convert('RGB'),(x,y))
         actual=Image.frombytes('RGB',(w,h),actual_data,'raw','BGR')
         error=max(v[1] for v in ImageChops.difference(expected,actual).getextrema())
-        assert error<=3,error
+        assert error<=(4 if rtl else 3),error
         report['images'].append({'name':'rectangle','max_channel_error':error});save()
         # Broken images never replace the displayed frame; next valid JPEG still works.
         valid=(out/'420_q80.jpg').read_bytes()
         cases=[('truncated',valid[:-20],w,h),('bad entropy',b'\xff\xd8'+b'garbage'*16+b'\xff\xd9',w,h),
                ('SOF/header dimensions mismatch',valid,w-1,h),('empty JPEG',b'\xff\xd8\xff\xd9',w,h)]
+        if rtl:
+            cases.append(('progressive JPEG',progressive.read_bytes(),w,h))
         for name,data,cw,ch in cases:
             before=stats(dev)
             dev.write(2,frame(data,cw,ch,mode=3),timeout=5000)

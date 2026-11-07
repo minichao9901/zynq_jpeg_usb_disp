@@ -20,7 +20,7 @@ work_root = Path(os.environ.get('ZYNQLINK_WORK_DIR', str(Path(__file__).resolve(
 runtime = work_root/'runtime/vivado'
 runtime.mkdir(parents=True, exist_ok=True)
 tmp = work_root/'tmp/vivado'
-tmp.mkdir(exist_ok=True)
+tmp.mkdir(parents=True, exist_ok=True)
 env['TEMP'] = env['TMP'] = str(tmp)
 seen = set()
 def copydeps(p):

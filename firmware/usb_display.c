@@ -52,7 +52,7 @@ _Static_assert(sizeof bos == 33, "BOS size");
 
 typedef struct {
     uint8_t header[16];
-    uint8_t pixels[4U*1024U*1024U] ALIGN32;
+    uint8_t pixels[4U*1024U*1024U] __attribute__((aligned(64)));
     unsigned header_used, used, length, x, y, w, h, id, type, reject, seeking;
     XTime last;
     XTime copy_ticks;
@@ -200,7 +200,8 @@ static void setup(XUsbPs_SetupData *s)
             result=send_reply(snapshot,sizeof snapshot,s->wLength);
         } else if(s->bmRequestType==0xc1 && s->bRequest==0x34 && s->wIndex==1) {
             uint32_t info[]={0x32445055U,1,UDISP_DEFAULT_ENCODING,UDISP_DRIVER_FPS,
-                profile_flags,UDISP_BUILD_ID,7,display_width,display_height};
+                profile_flags,UDISP_BUILD_ID,7U | (jpeg_rtl_available() ? 8U : 0U),
+                display_width,display_height};
             result=send_reply(info,sizeof info,s->wLength);
         } else if(s->bmRequestType==0xc1 && s->bRequest==0x31 && s->wIndex==1) {
             uint32_t snapshot[P_COUNT];
@@ -211,7 +212,7 @@ static void setup(XUsbPs_SetupData *s)
         } else if(s->bmRequestType==0x41 && s->bRequest==0x33 && s->wIndex==1 && !s->wLength && s->wValue<=3) {
             profile_flags=s->wValue;
             memset((void *)udisp_profile,0,sizeof udisp_profile);
-            udisp_profile[P_NEON]=jpeg_neon_available();
+            udisp_profile[P_JPEG_RTL]=jpeg_rtl_available();
             result=send_reply(NULL,0,0);
         } else if(s->bmRequestType==0x41 && s->bRequest==0x32 && s->wIndex==1 && !s->wLength) {
             reset_parser=1;
@@ -311,7 +312,7 @@ int usb_display_init(void)
 #endif
         (unsigned)display_width,(unsigned)display_height,(unsigned)UDISP_DRIVER_FPS);
     make_msos();
-    udisp_profile[P_NEON]=jpeg_neon_available();
+    udisp_profile[P_JPEG_RTL]=jpeg_rtl_available();
     if(!cfg || !icfg) return 1;
     /* Board USB3320 RESET_N is MIO8 (same wiring as zynqlinkPRO).
      * Some SDK 2018.3 hardware exports retain old PS init side products;

@@ -55,7 +55,7 @@ def firmware_info(dev):
     return result
 
 
-DISPLAY_KEYS='magic version buffers frame_events programmed latest ready drawing retired_mask decoded published replaced vdma frame_event_age_ms halted_seen error_seen no_buffer published_seq latest_seq guard_events settled control'.split()
+DISPLAY_KEYS='magic version buffers frame_events programmed latest ready drawing retired_mask decoded published replaced vdma frame_event_age_ms halted_seen error_seen no_buffer published_seq latest_seq guard_events settled control quarantined_mask'.split()
 
 
 def display_status(dev):
@@ -75,7 +75,7 @@ def wait_display(dev,timeout=2):
     raise RuntimeError('Display did not settle: '+str(status))
 
 
-PROFILE_KEYS='version flags frames convert_us jpeg_us flush_us wait_us fnv_us copy_us frame_us last_us max_us jpeg_errors neon sink_frames hz'.split()
+PROFILE_KEYS='version flags frames convert_us jpeg_us flush_us wait_us fnv_us copy_us frame_us last_us max_us jpeg_errors neon sink_frames hz jpeg_rtl jpeg_hw_status jpeg_hw_cycles'.split()
 
 
 def profile(dev):

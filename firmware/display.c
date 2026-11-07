@@ -19,6 +19,7 @@ static int ready=-1,drawing=-1;
 static uint32_t frame_epoch,retired_mask,retired_at[UDISP_FB_COUNT];
 static uint32_t sequences[UDISP_FB_COUNT],decoded,published,replaced,published_epoch;
 static uint32_t halted_seen,error_seen,no_buffer;
+static uint32_t quarantined_mask;
 static XTime last_frame_event;
 static uint32_t address(unsigned i) { return UDISP_FB_BASE + i * UDISP_FB_SPAN; }
 uint32_t display_front_address(void) { return address(programmed); }
@@ -63,7 +64,7 @@ int display_init(void)
     if (XAxiVdma_DmaConfig(&vdma, XAXIVDMA_READ, &setup) ||
         XAxiVdma_DmaSetBufferAddr(&vdma, XAXIVDMA_READ, frames) ||
         XAxiVdma_DmaStart(&vdma, XAXIVDMA_READ)) return -4;
-    if (DisplayInitialize(&controller, XPAR_VTC_0_DEVICE_ID, XPAR_AXI_DYNCLK_0_BASEADDR) ||
+    if (DisplayInitialize(&controller, XPAR_VTC_0_DEVICE_ID, 0) ||
         DisplaySetMode(&controller, mode) || DisplayStart(&controller)) return -5;
     last_frame_event=profile_now();
     return 0;
@@ -98,7 +99,7 @@ uint8_t *display_prepare(unsigned x,unsigned y,unsigned w,unsigned h)
     display_poll();
     if(drawing>=0) return NULL;
     for(i=0;i<UDISP_FB_COUNT;++i) {
-        if(i==programmed || (int)i==ready || (retired_mask&(1U<<i))) continue;
+        if(i==programmed || (int)i==ready || ((retired_mask|quarantined_mask)&(1U<<i))) continue;
         drawing=(int)i;base=(uint8_t *)address(i);
         if (x || y || w != display_width || h != display_height)
             memcpy(base,(void *)address(latest),display_width*display_height*3);
@@ -108,14 +109,16 @@ uint8_t *display_prepare(unsigned x,unsigned y,unsigned w,unsigned h)
     return NULL;
 }
 
-int display_commit(uint8_t *base)
+static int publish_drawing(uint8_t *base, int cpu_written)
 {
     unsigned back;
     XTime start=profile_now();
     if(drawing<0 || base!=(uint8_t *)address((unsigned)drawing)) return -1;
     back=(unsigned)drawing;
-    Xil_DCacheFlushRange((INTPTR)base, display_width*display_height*3);
-    profile_add(P_FLUSH_US,start);
+    if (cpu_written) {
+        Xil_DCacheFlushRange((INTPTR)base, display_width*display_height*3);
+        profile_add(P_FLUSH_US,start);
+    }
     if(ready>=0) ++replaced;
     latest=back;ready=(int)back;drawing=-1;
     sequences[back]=++decoded;
@@ -125,7 +128,14 @@ int display_commit(uint8_t *base)
     return 0;
 }
 
+int display_commit(uint8_t *base) { return publish_drawing(base, 1); }
+int display_commit_dma(uint8_t *base) { return publish_drawing(base, 0); }
 void display_cancel(void) { drawing=-1; }
+void display_quarantine(void)
+{
+    if (drawing >= 0) quarantined_mask |= 1U << drawing;
+    drawing = -1;
+}
 
 void display_poll(void)
 {
@@ -166,6 +176,7 @@ void display_snapshot(uint32_t out[32])
     out[17]=sequences[programmed];out[18]=sequences[latest];out[19]=2;
     out[20]=ready<0 && drawing<0 && (uint32_t)(frame_epoch-published_epoch)>=2U;
     out[21]=XAxiVdma_ReadReg(XPAR_AXIVDMA_0_BASEADDR,XAXIVDMA_CR_OFFSET);
+    out[22]=quarantined_mask;
 }
 
 uint32_t display_frame_crc(void)

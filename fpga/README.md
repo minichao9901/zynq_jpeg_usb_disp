@@ -1,5 +1,9 @@
 # 精简 PL 构建输入
 
+RTL JPEG 分支使用 `build_jpeg_rtl.tcl` 生成含解码器的完整 PL 和 HDF。
+该脚本复用 LCD BD，并通过 `bd/jpeg_rtl.tcl` 接入 HP1 DMA 和固定像素时钟。
+RTL 接口与仿真见 [RTL JPEG 解码](../docs/jpeg-rtl.md)。以下是原参考 PL 的构建说明。
+
 原始 `reference/19_vdma_lcd` 已完成移植参考任务，整个 `reference/` 目录停止 Git 跟踪；
 本地文件保留并忽略。这里只保留重建硬件所需的少量源文件，避免提交原工程的缓存、
 综合/实现输出、仿真文件及 SDK 中间产物。

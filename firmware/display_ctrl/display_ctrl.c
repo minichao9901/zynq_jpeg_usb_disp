@@ -158,33 +158,37 @@ int DisplayStart(DisplayCtrl *dispPtr)
 	}
 
 
-	/*
-	 * Calculate the PLL divider parameters based on the required pixel clock frequency
-	 */
-	ClkFindParams(dispPtr->vMode.freq, &clkMode);
+	if (dispPtr->dynClkAddr) {
+		/*
+		 * Calculate the PLL divider parameters based on the required pixel clock frequency
+		 */
+		ClkFindParams(dispPtr->vMode.freq, &clkMode);
 
-	/*
-	 * Store the obtained frequency to pxlFreq. It is possible that the PLL was not able to
-	 * exactly generate the desired pixel clock, so this may differ from vMode.freq.
-	 */
-	dispPtr->pxlFreq = clkMode.freq;
+		/*
+		 * Store the obtained frequency to pxlFreq. It is possible that the PLL was not able to
+		 * exactly generate the desired pixel clock, so this may differ from vMode.freq.
+		 */
+		dispPtr->pxlFreq = clkMode.freq;
 
-	/*
-	 * Write to the PLL dynamic configuration registers to configure it with the calculated
-	 * parameters.
-	 */
-	if (!ClkFindReg(&clkReg, &clkMode))
-	{
-		xdbg_printf(XDBG_DEBUG_GENERAL, "Error calculating CLK register values\n\r");
-		return XST_FAILURE;
+		/*
+		 * Write to the PLL dynamic configuration registers to configure it with the calculated
+		 * parameters.
+		 */
+		if (!ClkFindReg(&clkReg, &clkMode))
+		{
+			xdbg_printf(XDBG_DEBUG_GENERAL, "Error calculating CLK register values\n\r");
+			return XST_FAILURE;
+		}
+		ClkWriteReg(&clkReg, dispPtr->dynClkAddr);
+
+		/*
+		 * Enable the dynamically generated clock
+	    */
+		ClkStop(dispPtr->dynClkAddr);
+		ClkStart(dispPtr->dynClkAddr);
+	} else {
+		dispPtr->pxlFreq = dispPtr->vMode.freq;
 	}
-	ClkWriteReg(&clkReg, dispPtr->dynClkAddr);
-
-	/*
-	 * Enable the dynamically generated clock
-    */
-	ClkStop(dispPtr->dynClkAddr);
-	ClkStart(dispPtr->dynClkAddr);
 
 	/*
 	 * Configure the vtc core with the display mode timing parameters
@@ -278,29 +282,33 @@ int DisplayStart(DisplayCtrl *dispPtr)
 	dispPtr->state = DISPLAY_STOPPED;
 	dispPtr->vMode = VMODE_800x480;
 
-	ClkFindParams(dispPtr->vMode.freq, &clkMode);
+	if (dispPtr->dynClkAddr) {
+		ClkFindParams(dispPtr->vMode.freq, &clkMode);
 
-	/*
-	 * Store the obtained frequency to pxlFreq. It is possible that the PLL was not able to
-	 * exactly generate the desired pixel clock, so this may differ from vMode.freq.
-	 */
-	dispPtr->pxlFreq = clkMode.freq;
+		/*
+		 * Store the obtained frequency to pxlFreq. It is possible that the PLL was not able to
+		 * exactly generate the desired pixel clock, so this may differ from vMode.freq.
+		 */
+		dispPtr->pxlFreq = clkMode.freq;
 
-	/*
-	 * Write to the PLL dynamic configuration registers to configure it with the calculated
-	 * parameters.
-	 */
-	if (!ClkFindReg(&clkReg, &clkMode))
-	{
-		xdbg_printf(XDBG_DEBUG_GENERAL, "Error calculating CLK register values\n\r");
-		return XST_FAILURE;
+		/*
+		 * Write to the PLL dynamic configuration registers to configure it with the calculated
+		 * parameters.
+		 */
+		if (!ClkFindReg(&clkReg, &clkMode))
+		{
+			xdbg_printf(XDBG_DEBUG_GENERAL, "Error calculating CLK register values\n\r");
+			return XST_FAILURE;
+		}
+		ClkWriteReg(&clkReg, dispPtr->dynClkAddr);
+
+		/*
+		 * Enable the dynamically generated clock
+	    */
+		ClkStart(dispPtr->dynClkAddr);
+	} else {
+		dispPtr->pxlFreq = dispPtr->vMode.freq;
 	}
-	ClkWriteReg(&clkReg, dispPtr->dynClkAddr);
-
-	/*
-	 * Enable the dynamically generated clock
-    */
-	ClkStart(dispPtr->dynClkAddr);
 
 	/* Initialize the VTC driver so that it's ready to use look up
 	 * configuration in the config table, then initialize it.

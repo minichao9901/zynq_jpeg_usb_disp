@@ -77,6 +77,8 @@ def wait_for_board(manifest):
             if (info['default_encoding']!=manifest['default_encoding'] or info['driver_fps_token']!=DRIVER_FPS or
                 info['build_id']!=int(manifest['build_id'],0) or info['profile_flags']!=2 or dev.product!=manifest['product']):
                 raise RuntimeError('Running firmware identity does not match the requested package')
+            if manifest.get('jpeg_decoder')=='pl-rtl' and not info['features']&8:
+                raise RuntimeError('The PL JPEG accelerator did not respond')
             if state['configured']!=1 or state['speed']!=480 or state['stage']!=3:
                 raise RuntimeError('USB high-speed configuration is not ready')
             video=display_status(dev)
@@ -165,11 +167,16 @@ def main():
     ap.add_argument('--build',action='store_true',help='compile the selected package before downloading')
     ap.add_argument('--dry-run',action='store_true',help='verify artifact hashes and print the exact pair, without hardware or registry access')
     ap.add_argument('--no-display',action='store_true',help='keep MI_00 disabled for diagnostic/throughput testing')
+    ap.add_argument('--legacy',action='store_true',help='select the prior board-validated NEON package')
     args=ap.parse_args();mode=normalize_mode(args.mode)
+    if args.build and args.legacy:
+        ap.error('Legacy packages are prebuilt.')
     if args.build:
         subprocess.run([sys.executable,str(ROOT/'tools/build.py'),'--mode',mode],cwd=ROOT,check=True)
-    package=ROOT/'prebuilt'/mode
+    package=ROOT/'prebuilt'/(mode if args.legacy else mode+'-rtl')
     manifest=validate_package(package,mode)
+    if not args.legacy and manifest.get('jpeg_decoder')!='pl-rtl':
+        raise ValueError('Expected an RTL JPEG hardware/firmware pair.')
     if args.dry_run:
         print(json.dumps({'mode':mode,'transport':'JTAG/RAM','fps_limit':None,'product':manifest['product'],
             'build_id':manifest['build_id'],'files':{name:{'path':str(package/name),'sha256':digest} for name,digest in manifest['sha256'].items()}},indent=2))

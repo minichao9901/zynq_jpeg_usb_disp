@@ -1,8 +1,8 @@
 # JTAG/RAM only. Never writes QSPI or other nonvolatile storage.
 set root [file normalize [file join [file dirname [info script]] ..]]
-set bit [file join $root prebuilt jpeg usb_display.bit]
-set elf [file join $root prebuilt jpeg usb_display.elf]
-set init [file join $root prebuilt jpeg ps7_init.tcl]
+set bit [file join $root prebuilt jpeg-rtl usb_display.bit]
+set elf [file join $root prebuilt jpeg-rtl usb_display.elf]
+set init [file join $root prebuilt jpeg-rtl ps7_init.tcl]
 if {[llength $argv] == 3} {
     lassign $argv elf bit init
     set elf [file normalize $elf]

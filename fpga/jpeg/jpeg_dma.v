@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 // GP0 controls the decoder. HP1 reads JPEG bytes and writes clipped BGR888
-// rows at the LCD stride. At most one burst per AXI direction is outstanding.
+// rows at the LCD stride. Writes are issued in order with a bounded response
+// window. Read bursts and write data each use one active burst at a time.
 module jpeg_dma #(
     parameter WATCHDOG_CYCLES = 12000000
 ) (
@@ -23,7 +24,7 @@ module jpeg_dma #(
     output reg [31:0] s_axi_rdata, output [1:0] s_axi_rresp,
     output reg s_axi_rvalid, input s_axi_rready,
 
-    (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME M_AXI, PROTOCOL AXI4, NUM_READ_OUTSTANDING 1, NUM_WRITE_OUTSTANDING 1, MAX_BURST_LENGTH 8" *)
+    (* X_INTERFACE_PARAMETER = "XIL_INTERFACENAME M_AXI, PROTOCOL AXI4, NUM_READ_OUTSTANDING 1, NUM_WRITE_OUTSTANDING 8, MAX_BURST_LENGTH 8" *)
     output reg [31:0] m_axi_araddr,
     output [7:0] m_axi_arlen, output [2:0] m_axi_arsize,
     output [1:0] m_axi_arburst, output [3:0] m_axi_arcache,
@@ -45,11 +46,14 @@ module jpeg_dma #(
     localparam [1:0] RD_IDLE=0, RD_ADDR=1, RD_DATA=2;
     localparam [2:0] WR_IDLE=0, WR_OFFSET=1, WR_ALIGN=2, WR_SPLIT=3,
         WR_ADDR=4, WR_DATA=5, WR_RESP=6;
+    localparam [3:0] MAX_WRITES = 8;
     reg [1:0] rd_state;
     reg [2:0] wr_state;
     reg active, stopping, complete;
     reg [7:0] fault;
     reg [31:0] cycles;
+    reg [3:0] write_limit, writes_pending, writes_peak;
+    reg [23:0] aw_count, aw_wait, w_wait, b_wait, pixel_wait, input_wait;
 
     // The AXI-Lite address and data channels can arrive in either order.
     reg have_aw, have_w;
@@ -87,6 +91,7 @@ module jpeg_dma #(
         if (!aresetn) begin
             have_aw <= 0; have_w <= 0; s_axi_bvalid <= 0; s_axi_rvalid <= 0;
             source <= 0; length <= 0; dest <= 0; size <= 0;
+            write_limit <= MAX_WRITES;
         end else begin
             if (s_axi_awready && s_axi_awvalid) begin
                 have_aw <= 1; control_addr <= s_axi_awaddr;
@@ -102,6 +107,9 @@ module jpeg_dma #(
                     16'h0c: length <= write_lanes(length,control_data,control_mask);
                     16'h10: dest <= write_lanes(dest,control_data,control_mask);
                     16'h14: size <= write_lanes(size,control_data,control_mask);
+                    16'h3c: if (control_mask[0] && control_data[7:0] >= 1 &&
+                        control_data[7:0] <= {4'b0,MAX_WRITES})
+                        write_limit <= control_data[3:0];
                     default: ;
                 endcase
             end
@@ -117,6 +125,14 @@ module jpeg_dma #(
                     16'h14: s_axi_rdata <= size;
                     16'h18: s_axi_rdata <= cycles;
                     16'h1c: s_axi_rdata <= {13'b0,pixels_written};
+                    16'h20: s_axi_rdata <= {8'b0,aw_count};
+                    16'h24: s_axi_rdata <= {8'b0,aw_wait};
+                    16'h28: s_axi_rdata <= {8'b0,w_wait};
+                    16'h2c: s_axi_rdata <= {8'b0,b_wait};
+                    16'h30: s_axi_rdata <= {8'b0,pixel_wait};
+                    16'h34: s_axi_rdata <= {8'b0,input_wait};
+                    16'h38: s_axi_rdata <= {28'b0,writes_peak};
+                    16'h3c: s_axi_rdata <= {28'b0,write_limit};
                     default: s_axi_rdata <= 0;
                 endcase
             end
@@ -256,7 +272,12 @@ module jpeg_dma #(
     wire [2:0] wr_room = 3'd0-m_axi_awaddr[5:3];
     wire page_split = (&m_axi_awaddr[11:6]) && wr_room != 0 && wr_total > wr_room;
     wire [30:0] aligned_mask = {7'b0,segment_mask} << offset_address[2:0];
-    wire write_fault = m_axi_bvalid && m_axi_bready && m_axi_bresp != 0;
+    wire aw_take = m_axi_awvalid && m_axi_awready;
+    wire b_take = m_axi_bvalid && m_axi_bready;
+    wire write_fault = b_take && m_axi_bresp != 0;
+    wire write_window_full = writes_pending >= write_limit;
+    wire serial_writes = write_limit == 1;
+    wire writes_drained = wr_state == WR_IDLE && writes_pending == 0;
     assign m_axi_awlen = {5'b0,wr_beats}-1'b1;
     assign m_axi_awburst = 2'b01;
     assign m_axi_awsize = 3'd3;
@@ -268,7 +289,19 @@ module jpeg_dma #(
     assign m_axi_wstrb = write_mask[7:0];
     assign m_axi_wlast = wr_beats == 1;
     assign m_axi_wvalid = wr_state == WR_DATA;
-    assign m_axi_bready = wr_state == WR_RESP;
+    assign m_axi_bready = writes_pending != 0 && (!serial_writes || wr_state == WR_RESP);
+
+    // All writes have the same AXI ID. The address/data FSM can start the
+    // next burst after WLAST; every B response still has to retire before
+    // completing a frame or releasing its buffer after an abort.
+    always @(posedge aclk) begin
+        if (!aresetn || !active) writes_pending <= 0;
+        else case ({aw_take,b_take})
+            2'b10: writes_pending <= writes_pending+1'b1;
+            2'b01: writes_pending <= writes_pending-1'b1;
+            default: ;
+        endcase
+    end
     always @(posedge aclk) begin
         if (!aresetn || !active) begin
             wr_state <= WR_IDLE;
@@ -288,7 +321,8 @@ module jpeg_dma #(
             end
             WR_SPLIT: begin
                 wr_beats <= page_split ? wr_room : wr_total;
-                wr_state <= stopping ? WR_IDLE : WR_ADDR;
+                if (stopping || write_fault) wr_state <= WR_IDLE;
+                else if (!write_window_full) wr_state <= WR_ADDR;
             end
             WR_ADDR: if (m_axi_awready) wr_state <= WR_DATA;
             WR_DATA: if (m_axi_wready) begin
@@ -297,12 +331,35 @@ module jpeg_dma #(
                 wr_beats <= wr_beats-1'b1;
                 wr_total <= wr_total-1'b1;
                 m_axi_awaddr <= m_axi_awaddr+8;
-                if (m_axi_wlast) wr_state <= WR_RESP;
+                if (m_axi_wlast) begin
+                    if (serial_writes) wr_state <= WR_RESP;
+                    else wr_state <= wr_total != 1 && !stopping && !write_fault ? WR_SPLIT : WR_IDLE;
+                end
             end
-            WR_RESP: if (m_axi_bvalid)
+            WR_RESP: if (b_take)
                 wr_state <= wr_total != 0 && !stopping && !write_fault ? WR_SPLIT : WR_IDLE;
             default: wr_state <= WR_IDLE;
         endcase
+    end
+
+    // Last-frame counters. Wait categories can overlap with useful work in
+    // other stages. B wait counts only cycles that block issue or completion.
+    always @(posedge aclk) begin
+        if (!aresetn || (!active && start)) begin
+            aw_count <= 0; aw_wait <= 0; w_wait <= 0; b_wait <= 0;
+            pixel_wait <= 0; input_wait <= 0; writes_peak <= 0;
+        end else if (active && !stopping) begin
+            if (aw_take) aw_count <= aw_count+1'b1;
+            if (m_axi_awvalid && !m_axi_awready) aw_wait <= aw_wait+1'b1;
+            if (m_axi_wvalid && !m_axi_wready) w_wait <= w_wait+1'b1;
+            if (!b_take && (wr_state == WR_RESP || (wr_state == WR_SPLIT && write_window_full) ||
+                (wr_state == WR_IDLE && jpeg_done && pixel_idle && !segment_pending && writes_pending != 0)))
+                b_wait <= b_wait+1'b1;
+            if (pixel_valid && !pixel_ready) pixel_wait <= pixel_wait+1'b1;
+            if (byte_ready && !byte_valid && bytes_left != 0) input_wait <= input_wait+1'b1;
+            if (aw_take && !b_take && writes_pending >= writes_peak)
+                writes_peak <= writes_pending+1'b1;
+        end
     end
 
     always @(posedge aclk) begin
@@ -319,7 +376,7 @@ module jpeg_dma #(
         end else if (stopping) begin
             // AXI VALID cannot be withdrawn during an abort. Drain all
             // accepted requests before allowing software to reuse memory.
-            if (rd_state == RD_IDLE && wr_state == WR_IDLE) active <= 0;
+            if (rd_state == RD_IDLE && writes_drained) active <= 0;
         end else begin
             cycles <= cycles+1'b1;
             if (pixel_take) pixels_written <= pixels_written+1'b1;
@@ -328,7 +385,7 @@ module jpeg_dma #(
                 fault <= abort ? ERR_ABORT : jpeg_error ? ERR_JPEG : read_fault ? ERR_READ :
                     write_fault ? ERR_WRITE : ERR_TIMEOUT;
             end else if (jpeg_done && pixel_idle && !segment_pending &&
-                rd_state == RD_IDLE && wr_state == WR_IDLE) begin
+                rd_state == RD_IDLE && writes_drained) begin
                 active <= 0;
                 complete <= pixels_written == expected_pixels;
                 if (pixels_written != expected_pixels) fault <= ERR_COUNT;

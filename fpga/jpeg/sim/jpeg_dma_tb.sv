@@ -20,17 +20,21 @@ module jpeg_dma_tb;
     reg [63:0] rdata=0;
     reg rlast=0,rvalid=0,bvalid=0;
     reg [1:0] rresp=0,bresp=0;
-    reg read_live=0,write_live=0,response_live=0;
-    integer rd_address,rd_remaining,wr_address,wr_remaining,b_delay;
+    reg read_live=0,write_live=0;
+    integer rd_address,rd_remaining,wr_address,wr_remaining;
+    integer response_due[0:15], response_head=0, response_tail=0;
+    integer b_latency=0, write_window=8, peak_responses=0;
+    wire response_live=response_head!=response_tail;
     integer cycle=0,src_length,width,height,x,y,expected_fault,inject=0;
     reg injected=0,abort_sent=0;
     reg [31:0] random_state=32'h17bc33e9;
     wire arready=!read_live && random_state[0];
-    wire awready=!write_live && !response_live && !bvalid && random_state[1];
+    wire awready=!write_live && response_tail-response_head<16 && random_state[1];
     wire wready=write_live && (random_state[2] || random_state[3]);
     string jpeg_file,out_file;
     integer p,i,f,count;
     reg [31:0] status,elapsed,actual;
+    reg [31:0] aw_count,b_wait,peak;
 
     jpeg_dma #(.WATCHDOG_CYCLES(6000000)) dut (
         .aclk(clk), .aresetn(resetn),
@@ -98,20 +102,22 @@ module jpeg_dma_tb;
             wr_remaining <= wr_remaining-1;
             if (wlast) begin
                 write_live <= 0;
-                response_live <= 1;
-                b_delay <= inject==6 && !abort_sent ? 35 : {30'b0,random_state[7:6]};
+                response_due[response_tail%16] <= cycle+b_latency+
+                    (inject==6 && !abort_sent ? 35 : {30'b0,random_state[7:6]});
+                response_tail <= response_tail+1;
+                if (response_tail-response_head+1>peak_responses)
+                    peak_responses <= response_tail-response_head+1;
             end
         end
-        if (response_live) begin
-            b_delay <= b_delay-1;
-            if (b_delay==0) begin
-                response_live <= 0;
-                bvalid <= 1;
-                bresp <= inject==4 && !injected ? 2'b10 : 2'b00;
-                if (inject==4) injected <= 1;
-            end
+        if (response_live && !bvalid && cycle>=response_due[response_head%16]) begin
+            bvalid <= 1;
+            bresp <= inject==4 && !injected ? 2'b10 : 2'b00;
+            if (inject==4) injected <= 1;
         end
-        if (bvalid && bready) bvalid <= 0;
+        if (bvalid && bready) begin
+            bvalid <= 0;
+            response_head <= response_head+1;
+        end
     end
 
     task control_write(input [15:0] addr, input [31:0] value);
@@ -158,11 +164,19 @@ module jpeg_dma_tb;
                 $fatal(1,"busy cleared before AXI drained");
             control_read(24,elapsed);
             control_read(28,actual);
+            control_read(32,aw_count);
+            control_read(44,b_wait);
+            control_read(56,peak);
             if (fault==0 && (status!==32'd2 || actual!==width*height) ||
                 fault!=0 && status!==((fault<<8)|4))
                 $fatal(1,"status=%h fault=%d pixels=%d cycles=%d parser=%d byte=%d",
                     status,fault,actual,elapsed,dut.entropy.state,src_length-dut.bytes_left);
-            $display("RESULT status=%08x pixels=%0d cycles=%0d",status,actual,elapsed);
+            if (peak>write_window || peak_responses>write_window)
+                $fatal(1,"AXI write window exceeded");
+            if (fault==0 && write_window>1 && b_latency>=25 && aw_count>=64 && peak<2)
+                $fatal(1,"Expected overlapping AXI writes");
+            $display("RESULT status=%08x pixels=%0d cycles=%0d aw=%0d b_wait=%0d peak=%0d",
+                status,actual,elapsed,aw_count,b_wait,peak);
         end
     endtask
 
@@ -173,6 +187,8 @@ module jpeg_dma_tb;
             !$value$plusargs("fault=%d",expected_fault))
             $fatal(1,"missing arguments");
         if (!$value$plusargs("inject=%d",inject)) inject=0;
+        if (!$value$plusargs("b_latency=%d",b_latency)) b_latency=0;
+        if (!$value$plusargs("write_window=%d",write_window)) write_window=8;
         f=$fopen(jpeg_file,"rb");
         src_length=$fread(source,f);
         $fclose(f);
@@ -182,6 +198,9 @@ module jpeg_dma_tb;
         resetn=1;
         control_read(0,status);
         if (status!==32'h4a504701) $fatal(1,"invalid hardware ID");
+        control_write(60,write_window);
+        control_read(60,status);
+        if (status!==write_window) $fatal(1,"write window configuration failed");
         if (inject!=0) begin
             run_job(inject);
             inject=0;

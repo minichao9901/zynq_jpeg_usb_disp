@@ -93,6 +93,9 @@ def main():
                ('SOF/header dimensions mismatch',valid,w-1,h),('empty JPEG',b'\xff\xd8\xff\xd9',w,h)]
         if rtl:
             cases.append(('progressive JPEG',progressive.read_bytes(),w,h))
+            # Preserve EOI so the corrupted scan reaches RTL and fails after
+            # it has already issued writes to the unpublished frame buffer.
+            cases.append(('premature EOI',valid[:-43]+b'\xff\xd9',w,h))
         for name,data,cw,ch in cases:
             before=stats(dev)
             dev.write(2,frame(data,cw,ch,mode=3),timeout=5000)

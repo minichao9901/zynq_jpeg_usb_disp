@@ -76,8 +76,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--quick', action='store_true', help='skip 800x480 cases')
     parser.add_argument('--case', action='append', default=[], help='run only these named cases')
+    parser.add_argument('--write-window', type=int, choices=range(1,9), default=8)
+    parser.add_argument('--b-latency', type=int, default=0, help='extra cycles before DDR write responses')
+    parser.add_argument('--out', type=Path, default=ROOT/'build/jpeg-rtl-sim')
     args = parser.parse_args()
-    out = ROOT/'build/jpeg-rtl-sim'
+    if args.b_latency<0:
+        parser.error('Write response latency must be nonnegative.')
+    out = args.out
     out.mkdir(parents=True,exist_ok=True)
     rtl = ROOT/'fpga/jpeg'
     sources = sorted(rtl.glob('*.v')) + sorted((rtl/'core').glob('*.v'))
@@ -94,14 +99,17 @@ def main():
         x,y = case.origin
         process = subprocess.run(['vvp',str(sim),f'+input={jpg}',f'+output={bgr}',
                                   f'+width={w}',f'+height={h}',f'+x={x}',f'+y={y}',
-                                  f'+fault={case.fault}',f'+inject={case.inject}'],
+                                  f'+fault={case.fault}',f'+inject={case.inject}',
+                                  f'+b_latency={args.b_latency}',f'+write_window={args.write_window}'],
                                  capture_output=True,text=True,timeout=300)
         (out/(case.name+'.log')).write_text(process.stdout+process.stderr,encoding='utf8')
         if process.returncode:
             raise RuntimeError(case.name+'\n'+process.stdout+process.stderr)
-        status,pixels,cycles = re.findall(r'RESULT status=(\w+) pixels=(\d+) cycles=(\d+)',
-                                         process.stdout)[-1]
-        result = {'status':status,'pixels':int(pixels),'cycles':int(cycles),'jpeg_bytes':len(case.data)}
+        status,pixels,cycles,aw,b_wait,peak = re.findall(
+            r'RESULT status=(\w+) pixels=(\d+) cycles=(\d+) aw=(\d+) b_wait=(\d+) peak=(\d+)',
+            process.stdout)[-1]
+        result = {'status':status,'pixels':int(pixels),'cycles':int(cycles),'jpeg_bytes':len(case.data),
+                  'write_bursts':int(aw),'b_wait_cycles':int(b_wait),'peak_writes':int(peak)}
         if not case.fault:
             expected = Image.open(jpg).convert('RGB')
             actual = Image.frombytes('RGB',case.size,bgr.read_bytes(),'raw','BGR')

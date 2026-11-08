@@ -1,5 +1,6 @@
 set root [file normalize [file join [file dirname [info script]] ..]]
-open_project [file join $root build fpga usb_display.xpr]
+set out [file join $root build fpga]
+open_project [file join $out usb_display.xpr]
 set_param general.maxThreads 2
 foreach run [get_runs] {
     if {[get_property IS_SYNTHESIS $run]} {
@@ -19,7 +20,7 @@ launch_runs impl_1 -to_step write_bitstream -jobs 1
 wait_on_run impl_1
 if {[get_property PROGRESS [get_runs impl_1]] ne "100%"} {error "Implementation failed: [get_property STATUS [get_runs impl_1]]"}
 open_run impl_1
-report_timing_summary -file [file join $root prebuilt timing_summary.rpt]
-report_drc -file [file join $root prebuilt drc.rpt]
-file copy -force [file join $root build fpga usb_display.runs impl_1 system_wrapper.bit] [file join $root prebuilt usb_display.bit]
+report_timing_summary -file [file join $out timing_summary.rpt]
+report_drc -file [file join $out drc.rpt]
+file copy -force [file join $out usb_display.runs impl_1 system_wrapper.bit] [file join $out usb_display.bit]
 exit

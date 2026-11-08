@@ -1,0 +1,186 @@
+{
+  "firmware": {
+    "magic": 843337813,
+    "version": 1,
+    "default_encoding": 3,
+    "driver_fps_token": 999,
+    "profile_flags": 2,
+    "build_id": 259146609,
+    "features": 15,
+    "width": 800,
+    "height": 480
+  },
+  "usb": {
+    "magic": 827343957,
+    "version": 1,
+    "configured": 1,
+    "resets": 1,
+    "width": 800,
+    "height": 480,
+    "panel": 17284,
+    "usb_bytes": 78149880,
+    "chunks": 4913,
+    "frames": 1016,
+    "bad": 6,
+    "unsupported": 0,
+    "display_errors": 0,
+    "last_id": 65,
+    "last_type": 3,
+    "last_x": 0,
+    "last_y": 0,
+    "last_width": 800,
+    "last_height": 480,
+    "last_length": 45919,
+    "front": 35651584,
+    "vdma": 65536,
+    "frame_fnv": 3258767686,
+    "ep1_frames": 65,
+    "ep2_frames": 951,
+    "rx_timeouts": 0,
+    "setup": 468,
+    "stalls": 0,
+    "speed": 480,
+    "stage": 3,
+    "session": 2,
+    "resync_bytes": 0
+  },
+  "display": {
+    "magic": 827347780,
+    "version": 1,
+    "buffers": 5,
+    "frame_events": 4989,
+    "programmed": 35651584,
+    "latest": 35651584,
+    "ready": 0,
+    "drawing": 0,
+    "retired_mask": 0,
+    "decoded": 1016,
+    "published": 738,
+    "replaced": 278,
+    "vdma": 65536,
+    "frame_event_age_ms": 1,
+    "halted_seen": 0,
+    "error_seen": 0,
+    "no_buffer": 0,
+    "published_seq": 1016,
+    "latest_seq": 1016,
+    "guard_events": 2,
+    "settled": 1,
+    "control": 65537,
+    "quarantined_mask": 0
+  },
+  "topology": [
+    {
+      "name": "\\\\.\\DISPLAY1",
+      "device": "AMD Radeon(TM) Graphics",
+      "flags": 524293,
+      "mode": {
+        "width": 1920,
+        "height": 1080,
+        "x": 0,
+        "y": 0,
+        "hz": 60
+      }
+    },
+    {
+      "name": "\\\\.\\DISPLAY2",
+      "device": "AMD Radeon(TM) Graphics",
+      "flags": 524288
+    },
+    {
+      "name": "\\\\.\\DISPLAY3",
+      "device": "AMD Radeon(TM) Graphics",
+      "flags": 524288
+    },
+    {
+      "name": "\\\\.\\DISPLAY4",
+      "device": "AMD Radeon(TM) Graphics",
+      "flags": 524288
+    },
+    {
+      "name": "\\\\.\\DISPLAY5",
+      "device": "AMD Radeon(TM) Graphics",
+      "flags": 524288
+    },
+    {
+      "name": "\\\\.\\DISPLAY6",
+      "device": "Todesk Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY7",
+      "device": "Todesk Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY8",
+      "device": "Todesk Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY9",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY10",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY11",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY12",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY13",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY14",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY15",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY16",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY17",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY18",
+      "device": "GameViewer Virtual Display Adapter",
+      "flags": 0
+    },
+    {
+      "name": "\\\\.\\DISPLAY22",
+      "device": "xfz1986_usb_graphic(demo)",
+      "flags": 1,
+      "mode": {
+        "width": 800,
+        "height": 480,
+        "x": -800,
+        "y": 0,
+        "hz": 60
+      }
+    }
+  ],
+  "scanout_delta": 119,
+  "idd_delta": 65,
+  "passed": true
+}

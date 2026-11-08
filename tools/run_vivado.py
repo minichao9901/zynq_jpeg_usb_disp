@@ -1,7 +1,7 @@
 """Repair missing app-local DLLs from Vivado's own files, then use its launcher.
 
 Existing installation files are never overwritten. Added DLL paths are recorded
-in build/vivado_runtime/installation_added_files.json for reversible cleanup.
+in build/xilinx/runtime/vivado/installation_added_files.json.
 """
 import os
 from pathlib import Path
@@ -11,12 +11,12 @@ import shutil
 import pefile
 import json
 
-v = Path(os.environ.get('XILINX_VIVADO', r'E:\Xilinx\Vivado\2018.3'))
+v = Path(os.environ.get('XILINX_VIVADO', r'E:\Xilinx\Vivado\2018.3')).resolve()
 env = os.environ.copy()
 paths = [v/'bin/unwrapped/win64.o', v/'lib/win64.o', v/'tps/win64',
          v/'bin/unwrapped/win64.o/Microsoft.VC140.CRT', v/'tps/win64/jre9.0.4/bin/server', v/'tps/win64/jre9.0.4/bin']
 env['PATH'] = os.pathsep.join(str(p) for p in paths) + os.pathsep + env['PATH']
-work_root = Path(os.environ.get('ZYNQLINK_WORK_DIR', str(Path(__file__).resolve().parents[2]/'zynqlinkPRO-work')))
+work_root = Path(__file__).resolve().parents[1]/'build/xilinx'
 runtime = work_root/'runtime/vivado'
 runtime.mkdir(parents=True, exist_ok=True)
 tmp = work_root/'tmp/vivado'
@@ -53,8 +53,6 @@ env.update(RDI_APPROOT=str(v), XILINX_VIVADO=str(v), RDI_DATADIR=str(v/'data'),
            RDI_JAVAROOT=str(v/'tps/win64/jre9.0.4'), TCL_LIBRARY=str(v/'tps/tcl/tcl8.5'))
 for key in ('RDI_APPROOT','XILINX_VIVADO','RDI_DATADIR','HDI_APPROOT','RDI_BINROOT','RDI_BINDIR','RDI_LIBDIR','RDI_JAVAROOT','TCL_LIBRARY'):
     env[key] = env[key].replace('\\','/')
-overlay = runtime.parent/'vivado_overlay'
-env['RDI_LIBDIR'] = (v/'lib/win64.o').as_posix()
 p = subprocess.run([str(v/'bin/vivado.bat'), *sys.argv[1:]], env=env)
 print('Vivado exit:', p.returncode)
 raise SystemExit(p.returncode)

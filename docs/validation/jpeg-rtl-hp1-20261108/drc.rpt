@@ -1,0 +1,476 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.3 (win64) Build 2405991 Thu Dec  6 23:38:27 MST 2018
+| Date         : Sun Nov  8 07:58:56 2026
+| Host         : DESKTOP-0UKCPD3 running 64-bit major release  (build 9200)
+| Command      : report_drc -file E:/zynq_jpeg_usb_disp/build/fpga-jpeg-rtl/drc.rpt
+| Design       : system_wrapper
+| Device       : xc7z020clg400-2
+| Speed File   : -2
+| Design State : Fully Routed
+------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: checkpoint_routed
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max violations: <unlimited>
+             Violations found: 87
++-----------+----------+-------------------------------------------------+------------+
+| Rule      | Severity | Description                                     | Violations |
++-----------+----------+-------------------------------------------------+------------+
+| BUFC-1    | Warning  | Input Buffer Connections                        | 21         |
+| DPIP-1    | Warning  | Input pipelining                                | 3          |
+| DPOP-1    | Warning  | PREG Output pipelining                          | 13         |
+| DPOP-2    | Warning  | MREG Output pipelining                          | 35         |
+| REQP-1840 | Warning  | RAMB18 async control check                      | 12         |
+| REQP-20   | Advisory | enum_AREG_0_connects_CEA1_GND_connects_CEA2_GND | 1          |
+| REQP-165  | Advisory | writefirst                                      | 1          |
+| REQP-181  | Advisory | writefirst                                      | 1          |
++-----------+----------+-------------------------------------------------+------------+
+
+2. REPORT DETAILS
+-----------------
+BUFC-1#1 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_0/IBUF (in lcd_rgb_tri_iobuf_0 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#2 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_1/IBUF (in lcd_rgb_tri_iobuf_1 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#3 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_10/IBUF (in lcd_rgb_tri_iobuf_10 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#4 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_11/IBUF (in lcd_rgb_tri_iobuf_11 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#5 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_12/IBUF (in lcd_rgb_tri_iobuf_12 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#6 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_13/IBUF (in lcd_rgb_tri_iobuf_13 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#7 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_14/IBUF (in lcd_rgb_tri_iobuf_14 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#8 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_16/IBUF (in lcd_rgb_tri_iobuf_16 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#9 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_17/IBUF (in lcd_rgb_tri_iobuf_17 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#10 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_18/IBUF (in lcd_rgb_tri_iobuf_18 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#11 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_19/IBUF (in lcd_rgb_tri_iobuf_19 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#12 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_2/IBUF (in lcd_rgb_tri_iobuf_2 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#13 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_20/IBUF (in lcd_rgb_tri_iobuf_20 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#14 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_21/IBUF (in lcd_rgb_tri_iobuf_21 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#15 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_22/IBUF (in lcd_rgb_tri_iobuf_22 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#16 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_3/IBUF (in lcd_rgb_tri_iobuf_3 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#17 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_4/IBUF (in lcd_rgb_tri_iobuf_4 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#18 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_5/IBUF (in lcd_rgb_tri_iobuf_5 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#19 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_6/IBUF (in lcd_rgb_tri_iobuf_6 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#20 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_8/IBUF (in lcd_rgb_tri_iobuf_8 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+BUFC-1#21 Warning
+Input Buffer Connections
+Input buffer lcd_rgb_tri_iobuf_9/IBUF (in lcd_rgb_tri_iobuf_9 macro) has no loads. It is recommended to have an input buffer drive an internal load.
+Related violations: <none>
+
+DPIP-1#1 Warning
+Input pipelining
+DSP system_i/jpeg_dma_0/inst/entropy/dequantized input system_i/jpeg_dma_0/inst/entropy/dequantized/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#2 Warning
+Input pipelining
+DSP system_i/jpeg_dma_0/inst/expected_pixels_reg input system_i/jpeg_dma_0/inst/expected_pixels_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#3 Warning
+Input pipelining
+DSP system_i/jpeg_dma_0/inst/expected_pixels_reg input system_i/jpeg_dma_0/inst/expected_pixels_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPOP-1#1 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/entropy/dequantized output system_i/jpeg_dma_0/inst/entropy/dequantized/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#2 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#3 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#4 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#5 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#6 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#7 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#8 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#9 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#10 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#11 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0__0 output system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#12 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/offset_address2 output system_i/jpeg_dma_0/inst/offset_address2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#13 Warning
+PREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/pixels/val output system_i/jpeg_dma_0/inst/pixels/val/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-2#1 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/entropy/dequantized multiplier stage system_i/jpeg_dma_0/inst/entropy/dequantized/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#2 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/expected_pixels_reg multiplier stage system_i/jpeg_dma_0/inst/expected_pixels_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#3 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#4 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#5 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul0_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#6 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#7 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#8 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul1_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#9 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#10 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#11 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul2_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#12 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#13 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#14 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul3_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#15 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#16 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#17 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_x/mul4_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#18 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#19 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#20 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul0_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#21 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#22 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#23 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul1_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#24 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#25 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#26 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul2_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#27 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#28 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#29 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul3_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#30 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#31 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#32 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q_reg__0 multiplier stage system_i/jpeg_dma_0/inst/idct/u_idct_y/mul4_q_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#33 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/offset_address2 multiplier stage system_i/jpeg_dma_0/inst/offset_address2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#34 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/pixels/b_reg multiplier stage system_i/jpeg_dma_0/inst/pixels/b_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#35 Warning
+MREG Output pipelining
+DSP system_i/jpeg_dma_0/inst/pixels/r_reg multiplier stage system_i/jpeg_dma_0/inst/pixels/r_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+REQP-1840#1 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[10] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[6]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[0]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#2 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[10] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[6]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#3 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[10] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[6]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#4 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[11] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[7]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[0]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#5 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[11] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[7]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#6 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[11] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[7]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#7 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[12] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[8]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[0]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#8 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[12] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[8]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#9 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ADDRARDADDR[12] (net: system_i/jpeg_dma_0/inst/pixels/ADDRARDADDR[8]) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#10 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ENARDEN (net: system_i/jpeg_dma_0/inst/pixels/luma_reg_ENARDEN_cooolgate_en_sig_6) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[0]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#11 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ENARDEN (net: system_i/jpeg_dma_0/inst/pixels/luma_reg_ENARDEN_cooolgate_en_sig_6) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[1]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-1840#12 Warning
+RAMB18 async control check
+The RAMB18E1 system_i/jpeg_dma_0/inst/pixels/luma_reg has an input control pin system_i/jpeg_dma_0/inst/pixels/luma_reg/ENARDEN (net: system_i/jpeg_dma_0/inst/pixels/luma_reg_ENARDEN_cooolgate_en_sig_6) which is driven by a register (system_i/jpeg_dma_0/inst/idct/u_id_fifo/rd_ptr_q_reg[2]) that has an active asychronous set or reset. This may cause corruption of the memory contents and/or read values when the set/reset is asserted and is not analyzed by the default static timing analysis. It is suggested to eliminate the use of a set/reset to registers driving this RAMB pin or else use a synchronous reset in which the assertion of the reset is timed by default.
+Related violations: <none>
+
+REQP-20#1 Advisory
+enum_AREG_0_connects_CEA1_GND_connects_CEA2_GND
+system_i/jpeg_dma_0/inst/entropy/dequantized: When DSP48E1 attribute AREG is set to 0, the CEA1 and CEA2 pins should be tied to GND to save power.
+Related violations: <none>
+
+REQP-165#1 Advisory
+writefirst
+Synchronous clocking is detected for BRAM (system_i/axi_vdma_0/U0/I_PRMRY_DATAMOVER/GEN_MM2S_FULL.I_MM2S_FULL_WRAPPER/GEN_INCLUDE_MM2S_SF.I_RD_SF/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_1) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>
+
+REQP-181#1 Advisory
+writefirst
+Synchronous clocking is detected for BRAM (system_i/axi_vdma_0/U0/I_PRMRY_DATAMOVER/GEN_MM2S_FULL.I_MM2S_FULL_WRAPPER/GEN_INCLUDE_MM2S_SF.I_RD_SF/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>

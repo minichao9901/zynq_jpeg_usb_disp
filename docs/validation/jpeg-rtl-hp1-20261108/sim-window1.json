@@ -1,0 +1,24 @@
+{
+  "800x480_color": {
+    "status": "00000002",
+    "pixels": 384000,
+    "cycles": 2251239,
+    "jpeg_bytes": 13889,
+    "write_bursts": 48188,
+    "b_wait_cycles": 1745654,
+    "peak_writes": 1,
+    "max_error": 5,
+    "mean_error": 1.1325
+  },
+  "800x480_high_entropy": {
+    "status": "00000002",
+    "pixels": 384000,
+    "cycles": 2252173,
+    "jpeg_bytes": 260714,
+    "write_bursts": 48188,
+    "b_wait_cycles": 1745404,
+    "peak_writes": 1,
+    "max_error": 2,
+    "mean_error": 0.5357
+  }
+}

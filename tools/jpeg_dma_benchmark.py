@@ -17,6 +17,7 @@ from usb_host import ROOT, connect, display_status, firmware_info, profile, set_
 
 
 FIXTURES = ('800x480_color', '800x480_high_entropy')
+RECORDED_FIXTURES = ROOT/'docs/validation/jpeg-rtl-hp1-20261108'
 REGISTERS = ('id', 'status', 'src', 'length', 'dst', 'size', 'cycles', 'pixels',
              'write_bursts', 'aw_wait', 'w_wait', 'b_wait', 'pixel_wait', 'input_wait',
              'peak_writes', 'write_window')
@@ -42,13 +43,27 @@ def registers(out, window=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, required=True)
-    parser.add_argument('--fixtures', type=Path, default=ROOT/'build/jpeg-rtl-sim')
+    parser.add_argument('--fixtures', type=Path, default=RECORDED_FIXTURES,
+                        help='archived JPEGs and hashes, or simulator output with reference BGR files')
     parser.add_argument('--window', type=int, choices=range(1,9), action='append',
                         help='test write window(s), default uses the loaded bitstream setting')
     parser.add_argument('--frames', type=int, default=128)
     args = parser.parse_args()
     if args.frames < 1:
         parser.error('Frames must be positive.')
+    recorded = args.fixtures/'fixtures.json'
+    checksums = json.loads(recorded.read_text(encoding='utf8')) if recorded.is_file() else None
+    images = {}
+    for name in FIXTURES:
+        jpeg = (args.fixtures/(name+'.jpg')).read_bytes()
+        jpeg_sha = hashlib.sha256(jpeg).hexdigest()
+        if checksums is not None:
+            if checksums[name]['jpeg_sha256'] != jpeg_sha:
+                raise ValueError(f'JPEG fixture SHA-256 mismatch: {name}')
+            bgr_sha = checksums[name]['bgr_sha256']
+        else:
+            bgr_sha = hashlib.sha256((args.fixtures/(name+'.bgr')).read_bytes()).hexdigest()
+        images[name] = jpeg, jpeg_sha, bgr_sha
     out = args.out.resolve()
     out.mkdir(parents=True, exist_ok=True)
     node = display_node()
@@ -63,6 +78,8 @@ def main():
         report['firmware'] = firmware_info(dev)
         if not report['firmware']['features']&8:
             raise RuntimeError('Board is not running the RTL JPEG decoder.')
+        if (report['firmware']['width'], report['firmware']['height']) != (800,480):
+            raise RuntimeError('The benchmark fixtures require an 800x480 display.')
         before = stats(dev)
         time.sleep(.2)
         if stats(dev)['ep1_frames'] != before['ep1_frames']:
@@ -77,12 +94,11 @@ def main():
                 registers(out, window)
             for name in FIXTURES:
                 set_profile(dev,2)
-                fixture = args.fixtures/(name+'.jpg')
-                jpeg = fixture.read_bytes()
+                jpeg, jpeg_sha, bgr_sha = images[name]
                 scanout_before = display_status(dev)
                 result = run(dev,jpeg,3,args.frames,8)
                 result['name'] = name
-                result['jpeg_sha256'] = hashlib.sha256(jpeg).hexdigest()
+                result['jpeg_sha256'] = jpeg_sha
                 result['profile'] = profile(dev)
                 result['registers'] = registers(out)
                 result['published_delta'] = result['display']['published']-scanout_before['published']
@@ -91,10 +107,9 @@ def main():
                     raise RuntimeError(f'Invalid completed JPEG job: {result["registers"]}')
                 bgr = read_ddr(result['display']['programmed'],800,480,
                                out/f'{name}-w{window or initial_window}.bgr')
-                reference = fixture.with_suffix('.bgr').read_bytes()
-                if bgr != reference:
-                    raise RuntimeError(f'Board DDR differs from the RTL reference for {name}.')
                 result['bgr_sha256'] = hashlib.sha256(bgr).hexdigest()
+                if result['bgr_sha256'] != bgr_sha:
+                    raise RuntimeError(f'Board DDR differs from the RTL reference for {name}.')
                 report['runs'].append(result)
                 print(f'{name} window={window or initial_window or "original"} '
                       f'{result["fps"]:.2f} fps, {result["registers"]["cycles"]} PL cycles',flush=True)

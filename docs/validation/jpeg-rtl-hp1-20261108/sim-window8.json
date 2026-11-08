@@ -1,0 +1,157 @@
+{
+  "gray_single_pixel": {
+    "status": "00000002",
+    "pixels": 1,
+    "cycles": 550,
+    "jpeg_bytes": 332,
+    "write_bursts": 1,
+    "b_wait_cycles": 38,
+    "peak_writes": 1,
+    "max_error": 1,
+    "mean_error": 1.0
+  },
+  "444_roi": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 35776,
+    "jpeg_bytes": 2188,
+    "write_bursts": 1336,
+    "b_wait_cycles": 35,
+    "peak_writes": 5,
+    "max_error": 3,
+    "mean_error": 1.1109
+  },
+  "422_optimized": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 24741,
+    "jpeg_bytes": 867,
+    "write_bursts": 1336,
+    "b_wait_cycles": 33,
+    "peak_writes": 5,
+    "max_error": 5,
+    "mean_error": 1.1324
+  },
+  "420_restart_page_split": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 21144,
+    "jpeg_bytes": 861,
+    "write_bursts": 1337,
+    "b_wait_cycles": 34,
+    "peak_writes": 5,
+    "max_error": 5,
+    "mean_error": 1.2095
+  },
+  "gray_noise": {
+    "status": "00000002",
+    "pixels": 7857,
+    "cycles": 33767,
+    "jpeg_bytes": 6225,
+    "write_bursts": 1057,
+    "b_wait_cycles": 35,
+    "peak_writes": 7,
+    "max_error": 1,
+    "mean_error": 0.5416
+  },
+  "read_error_recovery": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 35848,
+    "jpeg_bytes": 2188,
+    "write_bursts": 1336,
+    "b_wait_cycles": 33,
+    "peak_writes": 5,
+    "max_error": 3,
+    "mean_error": 1.1109
+  },
+  "write_error_recovery": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 35834,
+    "jpeg_bytes": 2188,
+    "write_bursts": 1336,
+    "b_wait_cycles": 33,
+    "peak_writes": 6,
+    "max_error": 3,
+    "mean_error": 1.1109
+  },
+  "abort_write_recovery": {
+    "status": "00000002",
+    "pixels": 10541,
+    "cycles": 35833,
+    "jpeg_bytes": 2188,
+    "write_bursts": 1336,
+    "b_wait_cycles": 33,
+    "peak_writes": 5,
+    "max_error": 3,
+    "mean_error": 1.1109
+  },
+  "wrong_width": {
+    "status": "00000204",
+    "pixels": 0,
+    "cycles": 174,
+    "jpeg_bytes": 2188,
+    "write_bursts": 0,
+    "b_wait_cycles": 0,
+    "peak_writes": 0
+  },
+  "truncated_entropy": {
+    "status": "00000204",
+    "pixels": 10400,
+    "cycles": 34507,
+    "jpeg_bytes": 2145,
+    "write_bursts": 1316,
+    "b_wait_cycles": 0,
+    "peak_writes": 5
+  },
+  "premature_eoi": {
+    "status": "00000204",
+    "pixels": 10400,
+    "cycles": 34507,
+    "jpeg_bytes": 2147,
+    "write_bursts": 1316,
+    "b_wait_cycles": 0,
+    "peak_writes": 5
+  },
+  "wrong_restart": {
+    "status": "00000204",
+    "pixels": 344,
+    "cycles": 1331,
+    "jpeg_bytes": 861,
+    "write_bursts": 42,
+    "b_wait_cycles": 0,
+    "peak_writes": 4
+  },
+  "progressive_rejected": {
+    "status": "00000204",
+    "pixels": 0,
+    "cycles": 167,
+    "jpeg_bytes": 974,
+    "write_bursts": 0,
+    "b_wait_cycles": 0,
+    "peak_writes": 0
+  },
+  "800x480_color": {
+    "status": "00000002",
+    "pixels": 384000,
+    "cycles": 642298,
+    "jpeg_bytes": 13889,
+    "write_bursts": 48188,
+    "b_wait_cycles": 34,
+    "peak_writes": 5,
+    "max_error": 5,
+    "mean_error": 1.1325
+  },
+  "800x480_high_entropy": {
+    "status": "00000002",
+    "pixels": 384000,
+    "cycles": 1441322,
+    "jpeg_bytes": 260714,
+    "write_bursts": 48188,
+    "b_wait_cycles": 34,
+    "peak_writes": 5,
+    "max_error": 2,
+    "mean_error": 0.5357
+  }
+}

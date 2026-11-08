@@ -8,7 +8,7 @@ set_property CONFIG.c_num_fstores {1} [get_bd_cells axi_vdma_0]
 validate_bd_design
 save_bd_design
 generate_target all [get_files system.bd]
-write_hwdef -force -file [file join $root prebuilt system.hdf]
+write_hwdef -force -file [file join $root build fpga system.hdf]
 # PL is unchanged; keep the versioned shared bitstream.
 if {![file exists [file join $root prebuilt usb_display.bit]]} {error "Missing shared prebuilt LCD bitstream"}
 exit

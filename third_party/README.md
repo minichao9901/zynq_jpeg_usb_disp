@@ -16,6 +16,8 @@ Build: Cortex-A9, ARMv7 hard-float, Neon SIMD, static libjpeg API. The TurboJPEG
 API, filesystem tools, Java, arithmetic coding, and OS TLS are disabled. Decode
 runs on one bare-metal CPU; no dynamic CPU/OS feature probing is needed.
 
-`tools/arm-jpeg.cmake` and `tools/build.py` reproduce the library build.
-Generated objects and `libjpeg.a` live in `build/jpeg/`; final linked firmware
-and source/library SHA-256 values are delivered in `prebuilt/`.
+This dependency applies to the legacy NEON builds. The
+`lcd-continuous-20261106` tag contains their firmware build script.
+The matching packages and historical source/library SHA-256 values are
+in `prebuilt/jpeg/` and `prebuilt/rgb/`. The current RTL build uses the
+decoder sources in `fpga/jpeg/`.

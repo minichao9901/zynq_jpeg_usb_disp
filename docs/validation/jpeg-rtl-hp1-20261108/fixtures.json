@@ -1,0 +1,10 @@
+{
+  "800x480_color": {
+    "jpeg_sha256": "f982ec10385555ac5b34c427faa8ffbab1c551088bc46795e985d0595eebfaed",
+    "bgr_sha256": "8c806691dd08af24fabcbd7e4b9b6a579d88b2f46b25c06b28b3b8626ec043d6"
+  },
+  "800x480_high_entropy": {
+    "jpeg_sha256": "0d5e2e5d466769d4e471431b1d8bc0765c9a34e8845fd3fe3fa7d8d92da9b0e7",
+    "bgr_sha256": "2374e758b37cfbbf643545849079c83e08994a93547580cac1b14cecea97fe22"
+  }
+}

@@ -44,6 +44,6 @@ Vivado 2018.3 为 XC7Z020CLG400-2 完成综合、布局布线及 bit 生成。�
 
 每轮发 128 帧，每批 8 帧，关闭 FNV 计算。相同输入的 DDR 回读在初版、两种写窗口和 RTL 仿真之间逐字节一致。新版通过四种采样格式、非对齐区域和六种异常帧的板测，包含已开始写回后遇到提前 EOI 的恢复检查。渐变图解码超过 LCD 刷新时，VDMA 以约 60 Hz 取最新的可用帧。
 
-板测记录在 `build/jpeg-hp1-ab/`。运行 `python tools/jpeg_dma_benchmark.py --window 1 --window 8 --out build/jpeg-hp1-retest` 可复测，脚本使用仿真生成的 JPEG 和参考 BGR 文件，结束后恢复写窗口和 Windows 扩展显示状态。
+原始板测、仿真、资源和时序记录随 [验证归档](validation/jpeg-rtl-hp1-20261108/) 一起保存。运行 `python tools/jpeg_dma_benchmark.py --window 1 --window 8 --out build/jpeg-hp1-retest` 可直接使用归档中的两张 JPEG 和预期 BGR 哈希复测。也可用 `--fixtures build/jpeg-rtl-sim` 选择本次仿真生成的 JPEG 和参考 BGR。脚本结束后恢复写窗口和 Windows 扩展显示状态。
 
 IDCT 的八个 Verilog 文件来自 [Ultra-Embedded core_jpeg](https://github.com/ultraembedded/core_jpeg/tree/bb03cce45d0b7459d395486e9e1db3de1b416bd2/src_v)，采用 [Apache 2.0](../fpga/jpeg/core/LICENSE)。JPEG 码流格式参照 [ITU-T T.81](https://www.w3.org/Graphics/JPEG/itu-t81.pdf)。

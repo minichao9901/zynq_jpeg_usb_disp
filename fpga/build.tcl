@@ -16,8 +16,7 @@ add_files [file join $out usb_display.srcs sources_1 bd system hdl system_wrappe
 add_files -fileset constrs_1 [file join $root fpga constraints lcd.xdc]
 set_property top system_wrapper [current_fileset]
 update_compile_order -fileset sources_1
-file mkdir [file join $root prebuilt]
-write_hwdef -force -file [file join $root prebuilt system.hdf]
+write_hwdef -force -file [file join $out system.hdf]
 if {[lsearch -exact $argv --rebuild-pl] < 0} {
     # USB is entirely in PS MIO. Preserve the known LCD PL implementation.
     if {![file exists [file join $root prebuilt usb_display.bit]]} {error "Missing shared prebuilt LCD bitstream"}
@@ -32,7 +31,7 @@ launch_runs impl_1 -to_step write_bitstream -jobs 1
 wait_on_run impl_1
 if {[get_property PROGRESS [get_runs impl_1]] ne "100%"} {error "Implementation failed"}
 open_run impl_1
-report_timing_summary -file [file join $root prebuilt timing_summary.rpt]
-report_drc -file [file join $root prebuilt drc.rpt]
-file copy -force [file join $out usb_display.runs impl_1 system_wrapper.bit] [file join $root prebuilt usb_display.bit]
+report_timing_summary -file [file join $out timing_summary.rpt]
+report_drc -file [file join $out drc.rpt]
+file copy -force [file join $out usb_display.runs impl_1 system_wrapper.bit] [file join $out usb_display.bit]
 exit

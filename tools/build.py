@@ -10,7 +10,7 @@ from sdk_runtime import prepare
 from mode_config import DRIVER_FPS,ENCODINGS,product_for
 
 ROOT = Path(__file__).resolve().parents[1]
-SDK = Path('E:/Xilinx/SDK/2018.3')
+SDK = Path(os.environ.get('XILINX_SDK','E:/Xilinx/SDK/2018.3')).resolve()
 HARDWARE = ROOT/'build/fpga-jpeg-rtl'
 
 

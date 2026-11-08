@@ -1,4 +1,7 @@
 # Vivado 2018.3. Build and export a matched PL hardware handoff.
+if {[llength $argv] > 1 || ([llength $argv] == 1 && [lindex $argv 0] ne "--handoff-only")} {
+    error "Expected no arguments or --handoff-only"
+}
 set root [file normalize [file join [file dirname [info script]] ..]]
 set out [file join $root build fpga-jpeg-rtl]
 file mkdir $out
@@ -21,6 +24,10 @@ add_files -fileset constrs_1 [file join $root fpga constraints lcd.xdc]
 set_property top system_wrapper [current_fileset]
 update_compile_order -fileset sources_1
 write_hwdef -force -file [file join $out next_system.hdf]
+if {[lsearch -exact $argv --handoff-only] >= 0} {
+    puts "Validated RTL block design and staged [file join $out next_system.hdf]"
+    exit
+}
 synth_design -top system_wrapper -part xc7z020clg400-2
 write_checkpoint -force [file join $out synthesized.dcp]
 opt_design

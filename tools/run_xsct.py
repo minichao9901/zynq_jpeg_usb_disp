@@ -17,13 +17,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('script', type=Path)
     ap.add_argument('script_args', nargs='*')
-    ap.add_argument('--sdk', type=Path, default=Path(r'E:\Xilinx\SDK\2018.3'))
+    ap.add_argument('--sdk', type=Path, default=Path(os.environ.get('XILINX_SDK',r'E:\Xilinx\SDK\2018.3')))
     args = ap.parse_args()
     root = Path(__file__).resolve().parents[1]
-    work_root = Path(os.environ.get('ZYNQLINK_WORK_DIR', str(root.parent/'zynqlinkPRO-work')))
+    work_root = root/'build/xilinx'
     out = work_root / 'runtime/xilinx'
     out.mkdir(parents=True, exist_ok=True)
-    sdk = args.sdk
+    sdk = args.sdk.resolve()
     search = [sdk / p for p in ['lib/win64.o', 'bin/unwrapped/win64.o', 'tps/win64']]
     seen = set()
 

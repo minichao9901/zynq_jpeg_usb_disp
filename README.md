@@ -1,111 +1,113 @@
 # Zynq USB Display（RGB565 + JPEG）
 
-目标硬件：正点原子 Zynq-7020，PS USB3320，PL VDMA + RGB LCD，800×480。
-支持 RGB565 和 JPEG，兼容本机已安装的 `xfz1986_usb_graphic` Windows IDD 驱动。
-JPEG 在 PL 内解码。64 位 AXI DMA 读取 DDR 中的压缩数据，把 BGR888 写入后台缓冲，再由 VDMA 在帧边界切换画面。
+正点原子 Zynq-7020、PS USB3320、PL VDMA 与 800×480 RGB LCD。支持 RGB565 和单扫描 8 位 Baseline JPEG。JPEG 由 PL 解码，经 HP1 写入 DDR 后台帧缓冲，再由 HP0 上的 VDMA 在帧边界切换画面。支持灰度、4:4:4、水平 4:2:2、4:2:0、动态 Huffman 表和重启标记。渐进式 JPEG 会被拒绝。
 
-**本分支交付 JPEG 和 RGB565 两套不限帧率的 RTL 版本，验证范围为离线仿真、综合和实现。**
+| 默认 USB 编码 | FPGA bitstream | ARM ELF | 配套文件 |
+| --- | --- | --- | --- |
+| JPEG | [BIT](prebuilt/jpeg-rtl/usb_display.bit) | [ELF](prebuilt/jpeg-rtl/usb_display.elf) | [SHA-256 清单](prebuilt/jpeg-rtl/manifest.json) |
+| RGB565 | [BIT](prebuilt/rgb-rtl/usb_display.bit) | [ELF](prebuilt/rgb-rtl/usb_display.elf) | [SHA-256 清单](prebuilt/rgb-rtl/manifest.json) |
+
+两套使用相同的 PL，ELF 都支持两种帧类型。各目录包含匹配的 HDF 和 PS 初始化脚本。下载使用 JTAG/RAM，断电后需要重新下载。较早的 NEON 版本可通过 `--legacy` 选择，见[产物目录](prebuilt/README.md)。
+
+## 板测与资源
+
+JPEG 版构建 `0x0f724371` 已上板，USB 以 480 Mbps 枚举，Windows 以 800×480、60 Hz 扩展屏运行。HP1 写回从逐笔等待 B 响应改为最多 8 笔在途。单笔模式每帧花约 15.91 ms 等 B，占约 75%；多笔模式阻塞式等待降到 30 个周期。两组各发 128 帧，每批 8 帧，关闭 FNV。
+
+| 相同的 800×480 JPEG | 旧版 → 新版 PL 任务耗时 | 旧版 → 新版端到端解码吞吐 |
+| --- | ---: | ---: |
+| 4:2:0 彩色渐变，13,889 B/帧 | 21.20 → **6.36 ms** | 42.64 → **117.04 帧/秒** |
+| 4:2:0 高熵亮度，260,714 B/帧 | 21.21 → **14.41 ms** | 40.19 → **55.24 帧/秒** |
+
+DDR 回读与旧版、RTL 仿真逐字节一致。四种采样格式、非对齐区域和六种异常帧恢复通过板测，15 项 RTL 仿真通过。吞吐统计到 USB 输入对应的帧解码完成，LCD 扫描约 60 Hz，超过刷新率时会取最新的完整帧。历史 RGB565 板测的三轮中位数为纯接收 41.84 MB/s、转换并显示 41.71 MB/s，见[历史记录](docs/lcd-continuous-scanout.md)。
+
+| XC7Z020 布线后资源 | JPEG 解码器＋DMA | HP1 SmartConnect | 整机 / 器件容量 |
+| --- | ---: | ---: | ---: |
+| LUT | 6,818 | 3,030 | 13,375 / 53,200（25.1%） |
+| FF | 5,518 | 3,876 | 15,602 / 106,400（14.7%） |
+| BRAM（按 18 Kb 折算） | 9 | 0 | 19 / 280（6.8%） |
+| DSP48 | 37 | 0 | 37 / 220（16.8%） |
+
+100 MHz 布线后最差建立裕量 +0.005 ns，保持裕量 +0.034 ns，DRC 0 错误。原始证据随 Git 保存。[板上 A/B](docs/validation/jpeg-rtl-hp1-20261108/board-ab.json) · [验收](docs/validation/jpeg-rtl-hp1-20261108/board-acceptance.json) · [资源](docs/validation/jpeg-rtl-hp1-20261108/utilization.rpt) · [时序](docs/validation/jpeg-rtl-hp1-20261108/timing_summary.rpt) · [实现与复测](docs/jpeg-rtl.md)
+
+## 克隆与准备
 
 ```powershell
-python tools/flash.py rgb --dry-run
+git clone https://github.com/minichao9901/zynq_jpeg_usb_disp.git
+cd zynq_jpeg_usb_disp
+python -m pip install -r requirements.txt
+```
+
+- Windows 10/11 64 位，Python 3.10 或更新版本。Python 依赖已包含 Windows 用的 libusb，可通过 `ZYNQ_LIBUSB_DLL` 或 `usb_host.py --dll` 指定其他 DLL。
+- 上板下载需要 Xilinx SDK 2018.3 和已安装的 JTAG cable driver。重新综合需要 Vivado 2018.3，RTL 仿真需要 PATH 上的 Icarus Verilog（`iverilog`、`vvp`）。
+- 工具默认位于 `E:/Xilinx/SDK/2018.3` 与 `E:/Xilinx/Vivado/2018.3`。其他安装位置在当前 PowerShell 设置 `$env:XILINX_SDK` 和 `$env:XILINX_VIVADO`。运行时 DLL 缓存、Vivado 输出和本机日志在 Git 忽略的 `build/` 中。
+- Windows 扩展显示需要安装 [xfz1986 USB IDD 驱动](https://github.com/chuanjinpang/win10_idd_xfz1986_usb_graphic_driver_display)，控制 IDD 与修改注册表需管理员 PowerShell。USB 诊断接口 MI_01 可独立使用。
+
+仓库包含完整 RTL、固件、Vivado IP 元数据、验证样本与可直接下载的 bit/ELF。无需原 `reference/`、其他工程目录或 Git 子模块。Xilinx 工具和 Windows 驱动需要另行安装。
+
+## CLI
+
+```powershell
+# 离线校验四套下载包
 python tools/flash.py jpeg --dry-run
-```
+python tools/flash.py rgb --dry-run
+python tools/flash.py jpeg --legacy --dry-run
+python tools/flash.py rgb --legacy --dry-run
 
-产物分别在 `prebuilt/rgb-rtl/`、`prebuilt/jpeg-rtl/`，两套 ELF 都支持两种 USB 帧类型，区别是默认编码。
-硬件支持 8 位单扫描 Baseline JPEG 的灰度、4:4:4、4:2:2（水平）、4:2:0、动态 Huffman 表和重启标记。
-渐进式 JPEG 会被拒绝。上板后去掉 `--dry-run` 即可下载，也可用 `--legacy` 选择此前板测过的 NEON 版本。
-实现及验证详见 [RTL JPEG 解码](docs/jpeg-rtl.md)。
-
-RGB565 基线提交 `09186d4`，tag 为 `rgb565-baseline-20261106`。
-JPEG 首版及 USB 吞吐分析见 [历史板测](docs/jpeg-and-throughput.md)，旧产物见 [不限帧率版本](docs/unrestricted-profiles.md)。
-历史连续扫描版无帧率限制的三轮中位数：纯接收 **41.84 MB/s**，RGB565 转换处理 **41.71 MB/s**。
-此前 23 MB/s 来自 30fps 主动限速（800×480×2×30=23.04MB/s），不是 USB 上限。
-
-## 构建、下载
-
-在本目录运行，工具链为 `E:/Xilinx/SDK/2018.3` 和 `E:/Xilinx/Vivado/2018.3`。
-Python 依赖用 `python -m pip install -r requirements.txt` 安装。离线仿真需要 Icarus Verilog 的 `iverilog` 和 `vvp`。
-
-```powershell
-# 先仿真，再从源码构建 PL 和配套固件
-python tools/jpeg_rtl_sim.py
-python tools/run_vivado.py -mode batch -source fpga/build_jpeg_rtl.tcl -log build/jpeg-rtl-vivado.log
-python tools/build.py
-
-# 板子上电、JTAG 与 USB OTG 数据口接好后，选择下载模式
-python tools/flash.py rgb
+# JTAG/RAM 下载，选择默认 JPEG 或 RGB565
 python tools/flash.py jpeg
+python tools/flash.py rgb
+# 仅下载，保持 MI_00 暂停，便于独立板测
+python tools/flash.py jpeg --no-display
+# 先重编所选固件，再下载配套 bit/ELF
+python tools/flash.py jpeg --build
 
-# 查询枚举、速度、帧计数和 VDMA 状态
+# USB 枚举/帧统计、固件 ID、VDMA 发布状态、PL 解码周期
 python tools/usb_host.py stats
+python tools/usb_host.py info
+python tools/usb_host.py display
+python tools/usb_host.py profile
 
-# 在同一固件上切换 Windows IDD 发送格式；脚本保留原主屏
-python tools/set_mode.py jpeg
+# 恢复扩展屏，或在同一固件上切换 Windows 发送格式
+python tools/enable_display.py
+python tools/set_mode.py jpeg --quality 8
 python tools/set_mode.py rgb565
+
+# RTL 仿真，及带额外 B 响应延迟的仿真
+python tools/jpeg_rtl_sim.py
+python tools/jpeg_rtl_sim.py --quick --b-latency 35 --out build/jpeg-sim-latency
+
+# 从已交付的 HDF/bit 重编固件；--bsp 可强制重建 BSP
+python tools/build.py --mode all
+# 完整重建 PL，随后使用新的 bit/HDF 编译固件
+python tools/run_vivado.py -mode batch -source fpga/build_jpeg_rtl.tcl -log build/jpeg-rtl-vivado.log
+python tools/build.py --bsp
+
+# 自动暂停 IDD、测试并恢复扩展屏
+./tools/test.ps1 -Frames 300
+./tools/jpeg_test.ps1
+./tools/benchmark.ps1 -Repeat 3 -Frames 128
+python tools/jpeg_dma_benchmark.py --window 1 --window 8 --out build/jpeg-hp1-retest
+
+# MI_00 暂停时发送 RGB 色条，或开启 FNV 后验证一帧
+python tools/usb_host.py colorbars
+python tools/usb_host.py test
+
+# 本地 CLI/包校验回归
+python -m unittest discover -s tools/tests
 ```
 
-`tools/load.tcl` 会处理断电后 hw_server 保留的 DAP 错误状态，执行 PS 初始化，
-加载 PL，再启动 Cortex-A9 #0；本应用只向 #0 下载。
-`load.ps1` 在下载前暂停 IDD，完成后通过扩展模式恢复，保留原主屏。
+`flash.py` 校验包哈希后初始化 PS、下载 bit 和 ELF，并检查运行构建 ID 和 VDMA。正常模式会恢复物理主屏与扩展屏。若 Windows 已把 USB 屏设为主屏，先在显示设置选回物理主屏，再运行 `enable_display.py`。板测脚本的负向用例会故意增加错误计数，正常吞吐应比较测试前后的增量。
 
-重编固件时可复用交付的 bit/HDF，或用 `--bsp` 强制重新生成 BSP。
+## Windows USB 接口
 
-`reference/` 已从 Git 跟踪及全部历史引用中移除，并加入忽略规则，本地资料保留。
-PL 重建必需的 IP、BD Tcl 和约束已保留在 `fpga/`，构建/下载不再依赖该资料目录。
-来源与目录说明见 [fpga/README.md](fpga/README.md)。
-历史重写后的提交/tag 对照与备份位置见 [Git 历史清理记录](docs/git-history-cleanup.md)。
-
-## Windows 驱动配置
-
-设备为 `303A:2986`，序列号 `ZYNQ-UDISP-RGB-001`。
+设备 `303A:2986`，序列号 `ZYNQ-UDISP-RGB-001`。
 
 | 接口 | 功能 | 端点/驱动 |
 | --- | --- | --- |
 | MI_00 | USB Display | OUT 0x01 / IN 0x81，`xfz1986_usb_graphic` |
 | MI_01 | 诊断及测试送帧 | OUT 0x02 / IN 0x82，MS OS 2.0 自动绑定 WinUSB |
 
-JPEG 产品串为 `zynq_R800x480_Ejpg8_Ergb16_Fps999_Bl4096`，RGB 产品串交换两个 E 项的先后顺序。
-Fps999 让参考驱动绕过低帧率丢帧逻辑，不要求软件达到 999fps；不再施加 30fps 限速。
-`Bl4096` 表示缓冲上限 4096KiB，并非行数。帧头实际长度字段最大为 4MiB−1。
-原 ESP32 工程说明中的全局注册表 `udisp` 会覆盖产品串，本次已备份旧值并设置为本产品串：
-
-```powershell
-reg query HKLM\SYSTEM\CurrentControlSet\Services\xfz1986_usb_graphic\Parameters /v udisp
-```
-
-原值为 `esp32s31_R240x296_Ergb16_Fps30_Bl128`，备份位于 `build/host-backup/idd-parameters.reg`。
-以后切回 ESP32 扩展屏时，需恢复为对应产品串。没有安装 IDD 驱动的电脑仍需安装该参考驱动；
-MI_01 的 WinUSB 诊断接口可独立使用。
-
-若插入后电脑主屏变黑，本次已确认原因是 Windows 选择了“仅在 USB 屏显示”。
-已改为扩展桌面并恢复原主屏；USB 屏位于主屏左侧，800×480。
-后续可运行 `python tools/enable_display.py`，它会保留启用前的主屏，并将 USB 屏启用为扩展屏。
-该脚本遇到设置失败会自动禁用 USB 显示接口，避免把原主屏留在关闭状态。
-
-`tools/usb_host.py` 使用 PyUSB + libusb。可用 `--dll <libusb-1.0.dll>` 指定库；
-本机自动发现路径包含 `E:/zynqlinkPRO/prebuilt/golden/host/openocd/libusb-1.0.dll`。
-
-## 板测
-
-```powershell
-# 测试期间暂停本设备 MI_00，结束后恢复，避免 IDD 帧覆盖测试图案
-./tools/test.ps1
-
-# 手动送一张色条，IDD 活跃时可能被桌面画面覆盖
-python tools/usb_host.py colorbars
-
-# JPEG 图像、异常恢复、物理 DDR 对比及连续 300 帧
-./tools/jpeg_test.ps1
-
-# 不限帧率，分别测带 FNV 校验、正常显示和纯接收，默认三轮
-./tools/benchmark.ps1
-```
-
-测试覆盖整帧、分片头/短包、跨传输帧、区域更新、越界区域拒绝、坏 JPEG 拒绝、中途残留数据后重新同步、
-截断帧超时恢复、连续 300 帧不限速发送，以及 MEM-AP0 物理读回整张 BGR888 scanout 帧缓冲逐字节比较。
-负向测试会故意增加 `bad`、`rx_timeouts` 等计数；暂停/恢复 IDD 也可能中止其在途帧并增加超时计数。
-应比较正常持续流期间的增量，不能把测试后的累计计数当作正常流量故障。
-Windows 桌面内容变化和显示刷新决定 IDD 提供帧的速率；需要总线极限时用 `tools/benchmark.ps1` 持续发送测试帧。
+JPEG 产品串为 `zynq_R800x480_Ejpg8_Ergb16_Fps999_Bl4096`，RGB 产品串交换两个 E 项的顺序。`Fps999` 让驱动绕过低帧率丢帧逻辑，`Bl4096` 为缓冲上限 4096 KiB。Windows 驱动注册表值 `udisp` 优先于 USB 产品串，下载和模式切换脚本会写入对应值，并在 `build/` 保存修改前的设置。
 
 ## 数据链路与协议
 
@@ -157,7 +159,7 @@ FNV 对应最新完成解码的画面；物理 DDR 校验会通过 `wait_display
 1. 保留 ESP32 的 VID/PID、接口 0、两个 bulk 端点及产品串格式，改为 800×480 RGB565。
 2. 使用 Zynq DAPLink 的 XUsbPs 配置、缓存处理和端点 DATA0 重置方式。
 3. USB3320 的 MIO28..39 使用 1.8V，MIO8 为低有效复位。固件在初始化 USB 前显式设置并释放 PHY。
-4. LCD 显示控制、动态时钟与引脚沿用 `19_vdma_lcd`，固定 33MHz 像素时钟和 800×480 时序。
+4. LCD 显示控制和引脚沿用 `19_vdma_lcd`，Clocking Wizard 提供固定 33 MHz 像素时钟。
 5. 参考工程中的上游版权说明保留在相应源文件；本版未移植 ESP32 的音频功能。
 
 RTL 的 IDCT 来源与许可见 [RTL JPEG 解码](docs/jpeg-rtl.md)。旧 NEON 版本的依赖和许可见 [third_party/README.md](third_party/README.md)。

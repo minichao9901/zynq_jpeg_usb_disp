@@ -2,6 +2,7 @@
 import argparse
 import ctypes.util
 import json
+import os
 from pathlib import Path
 import struct
 import time
@@ -14,17 +15,20 @@ KEYS = 'magic version configured resets width height panel usb_bytes chunks fram
 
 
 def connect(dll=None):
-    candidates = [dll, ctypes.util.find_library('usb-1.0'),
-        str(ROOT/'tools/libusb-1.0.dll'),
-        'E:/zynqlinkPRO/prebuilt/golden/host/openocd/libusb-1.0.dll']
-    backend = None
-    for path in candidates:
-        if path:
-            backend = usb.backend.libusb1.get_backend(find_library=lambda _: str(path))
-            if backend:
-                break
+    dll = dll or os.environ.get('ZYNQ_LIBUSB_DLL')
+    if dll:
+        path = Path(dll).expanduser().resolve(strict=True)
+        backend = usb.backend.libusb1.get_backend(find_library=lambda _: str(path))
+    else:
+        try:
+            import libusb_package
+        except ImportError:
+            libusb_package = None
+        backend = libusb_package.get_libusb1_backend() if libusb_package else None
+        if backend is None:
+            backend = usb.backend.libusb1.get_backend(find_library=ctypes.util.find_library)
     if backend is None:
-        raise RuntimeError('libusb-1.0.dll not found; use --dll')
+        raise RuntimeError('libusb unavailable; install requirements.txt or set ZYNQ_LIBUSB_DLL')
     matches = usb.core.find(find_all=True,idVendor=0x303a, idProduct=0x2986, backend=backend)
     dev = None
     for candidate in matches:
@@ -125,15 +129,25 @@ def wait_for(dev, key, target, timeout=4):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument('command', choices=['stats','colorbars','test'])
-    ap.add_argument('--dll')
+    diagnostics = {'stats': stats, 'info': firmware_info, 'display': display_status, 'profile': profile}
+    ap.add_argument('command', choices=[*diagnostics,'colorbars','test'])
+    ap.add_argument('--dll', help='override the bundled/system libusb with a specific DLL')
     ap.add_argument('--out',type=Path,default=ROOT/'build/usb-test.json')
     args = ap.parse_args()
     dev = connect(args.dll)
+    restore_flags = None
     try:
+        if args.command in diagnostics:
+            print(json.dumps(diagnostics[args.command](dev),indent=2))
+            return
+        if args.command=='test':
+            before = stats(dev)
+            time.sleep(.2)
+            if stats(dev)['ep1_frames'] != before['ep1_frames']:
+                raise RuntimeError('Pause MI_00 or download with --no-display before testing')
+            restore_flags = profile(dev)['flags']
+            set_profile(dev,0)
         before = stats(dev)
-        if args.command=='stats':
-            print(json.dumps(before,indent=2)); return
         w,h=before['width'],before['height']
         payload=pattern(w,h)
         target=before['ep2_frames']+1
@@ -148,7 +162,11 @@ def main():
         args.out.write_text(json.dumps(report,indent=2)+'\n')
         print(json.dumps(report,indent=2))
     finally:
-        usb.util.dispose_resources(dev)
+        try:
+            if restore_flags is not None:
+                set_profile(dev,restore_flags)
+        finally:
+            usb.util.dispose_resources(dev)
 
 
 if __name__=='__main__':

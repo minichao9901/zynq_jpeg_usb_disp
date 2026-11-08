@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[1]
 def prepare(sdk,tool):
     if tool not in ('hsi','bootgen','rdi_zynq_flash'):raise ValueError('Unsupported SDK tool')
     sdk=Path(sdk).resolve()
-    work_root=Path(os.environ.get('ZYNQLINK_WORK_DIR',str(ROOT.parent/'zynqlinkPRO-work')))
+    work_root=ROOT/'build/xilinx'
     work=(work_root/'runtime'/('sdk-'+tool)).resolve()
     resource_root=sdk
     work.mkdir(parents=True,exist_ok=True)

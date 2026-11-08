@@ -7,3 +7,6 @@ __pycache__/
 *.log
 *.str
 *.backup.*
+.venv/
+/usage_statistics_webtalk.html
+/usage_statistics_webtalk.xml

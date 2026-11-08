@@ -1,9 +1,11 @@
 # Unrestricted RGB/JPEG release pairs
 
-The RTL branch delivers `jpeg-rtl/` and `rgb-rtl/`, each with a matched BIT,
+The current release is in `jpeg-rtl/` and `rgb-rtl/`, each with a matched BIT,
 ELF, HDF, PS init and SHA-256 manifest. They share the RTL JPEG design and differ
 in default USB encoding. Use `python tools/flash.py jpeg --dry-run` or
 `python tools/flash.py rgb --dry-run` for offline package verification.
+The JPEG pair was measured on the board. Its build ID and artifact hashes are
+also recorded in the [board validation archive](../docs/validation/jpeg-rtl-hp1-20261108/).
 The pairs below are the earlier board-validated NEON builds.
 
 | Default Windows encoding | BIT | ELF | Download |
@@ -32,9 +34,9 @@ does not impose a 999fps processing target. Actual rates depend on USB,
 decoding, desktop changes, and the display refresh path.
 
 `usb_display.bit`, `system.hdf`, and `ps7_init.tcl` at this directory's root are
-shared hardware inputs. The root `usb_display.elf` remains a byte-identical JPEG
-compatibility alias; new downloads should always use `tools/flash.py` and the
-explicit mode directories. The root `manifest.json` indexes both packages.
+historical hardware artifacts. The root `usb_display.elf` is the historical JPEG
+compatibility alias. The root `manifest.json` indexes the legacy packages.
+Use the mode CLI above to select current or legacy matched artifacts.
 
 The CLI uses JTAG/RAM, verifies hashes before loading, updates the driver's
 registry override, verifies firmware identity and the received frame type, and
